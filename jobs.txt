@@ -1,0 +1,7 @@
+"job":"dotnet-health"
+"job":"ec2-standalone"
+"job":"ga4"
+"job":"loki"
+"job":"mongodb-atlas"
+"job":"prometheus"
+"job":"yace"

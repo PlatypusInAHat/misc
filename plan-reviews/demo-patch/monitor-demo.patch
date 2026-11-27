@@ -1,0 +1,164 @@
+diff --git a/demo/monitor-demo.html b/demo/monitor-demo.html
+index 32bafca..26ac1ef 100644
+--- a/demo/monitor-demo.html
++++ b/demo/monitor-demo.html
+@@ -1028,7 +1028,7 @@
+           <div class="card-header">
+             <div>
+               <h3 class="card-title">Phiên Điều hành AWS EventBridge (`edmicro-exam-ops-bus`)</h3>
+-              <div class="card-sub">Mọi thao tác hạ tầng đi qua EventBridge Rule &rarr; Step Functions / Automation Lambda, có RBAC, Interlock &amp; Audit Log</div>
++              <div class="card-sub">Mọi thao tác hạ tầng đi qua EventBridge Rule &rarr; External Executor (db · lambda · edge), có RBAC, Interlock &amp; Audit Log</div>
+             </div>
+             <div class="btn-row">
+               <label for="rbac-select" style="font-size:12px;color:var(--text-muted);align-self:center;font-weight:700;">Vai trò (RBAC):</label>
+@@ -1037,7 +1037,7 @@
+                 <option value="DEVOPS_SRE" selected>DEVOPS_SRE (Toàn quyền kỹ thuật)</option>
+               </select>
+               <label style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-card-alt);border:1px solid var(--border);padding:6px 10px;border-radius:7px;cursor:pointer;font-size:13px;">
+-                <input type="checkbox" id="chk-dry-run"> Chế độ Dry-Run (Chỉ xem Diff)
++                <input type="checkbox" id="chk-dry-run" checked> Chế độ Dry-Run (Chỉ xem Diff)
+               </label>
+             </div>
+           </div>
+@@ -1050,7 +1050,7 @@
+             <div class="card-header">
+               <div>
+                 <h3 class="card-title">Khối 1 — Preset Quy mô &amp; Giờ thi</h3>
+-                <div class="card-sub">DetailType: <code>ops.preset.apply</code> (Khớp Ma trận 5 mốc trong <code>BaoCaoSauThi.md</code>)</div>
++                <div class="card-sub">Tách thành lệnh con theo từng miền (<code>parent_action_id</code>) (Khớp Ma trận 5 mốc trong <code>BaoCaoSauThi.md</code>)</div>
+               </div>
+               <span class="badge badge-sky">Duty + SRE</span>
+             </div>
+@@ -1061,7 +1061,7 @@
+           <article class="card">
+             <div class="card-header">
+               <div>
+-                <h3 class="card-title">Khối 2 — Điều khiển MongoDB Atlas (<code>ops.db.control</code>)</h3>
++                <h3 class="card-title">Khối 2 — Điều khiển MongoDB Atlas (Rule <code>ops.db.control</code>)</h3>
+                 <div class="card-sub">CẤM scale tier nóng giữa giờ thi; Scale-Down bắt buộc qua <code>SafetyChecker</code> 5/5</div>
+               </div>
+               <span class="badge badge-purple">SRE Only (Scale)</span>
+@@ -1073,7 +1073,7 @@
+           <article class="card">
+             <div class="card-header">
+               <div>
+-                <h3 class="card-title">Khối 3 — Điều khiển AWS Lambda (<code>ops.lambda.control</code>)</h3>
++                <h3 class="card-title">Khối 3 — Điều khiển AWS Lambda (Rule <code>ops.lambda.control</code>)</h3>
+                 <div class="card-sub">Quản lý <code>examination-lambda</code>, <code>lambda-oauth</code> và Circuit Breaker <code>event-monitor</code></div>
+               </div>
+               <span class="badge badge-sky">Duty (Circuit Breaker) + SRE</span>
+@@ -1085,7 +1085,7 @@
+           <article class="card">
+             <div class="card-header">
+               <div>
+-                <h3 class="card-title">Khối 4 — EC2 ASG &amp; Cloudflare Edge (<code>ops.ec2.asg.control</code>)</h3>
++                <h3 class="card-title">Khối 4 — EC2 ASG &amp; Cloudflare Edge (Rule <code>ops.edge.control</code>)</h3>
+                 <div class="card-sub">Interlock khóa tăng EC2 <code>api-elb/oauth</code> nếu DB đang Vàng/Đỏ; cho phép bật Waiting Room</div>
+               </div>
+               <span class="badge badge-sky">Interlock Protected</span>
+@@ -1174,7 +1174,7 @@
+   </main>
+ 
+   <!-- Native Modal Dialog (NO role="dialog" or aria-modal; autofocus on Cancel) -->
+-  <dialog id="confirm-dialog" aria-labelledby="confirm-dialog-title" closedby="any">
++  <dialog id="confirm-dialog" aria-labelledby="confirm-dialog-title" closedby="closerequest">
+     <form method="dialog">
+       <div class="dialog-head">
+         <h2 id="confirm-dialog-title" style="margin:0;font-size:16px;">Xác nhận gửi lệnh AWS EventBridge</h2>
+@@ -1573,8 +1573,8 @@
+       let currentRole = 'DEVOPS_SRE';
+       let pendingAction = null;
+       let auditEntries = [
+-        { time: '18:30:05', actor: 'automation-lambda (SCHEDULE)', detail: 'ops.preset.apply / Pre-Warm T-45m', target: 'api-elb: 25->38, oauth: 15->22, Suspend ScaleIn', status: 'EXECUTED' },
+-        { time: '19:14:52', actor: 'nguyenvana (EXAM_DUTY_OPERATOR)', detail: 'ops.lambda.control / Provisioned Pha 1', target: 'examination-lambda Provisioned: 0 -> 1200', status: 'EXECUTED' }
++        { time: '18:45:00', actor: 'scheduler (SYSTEM_SCHEDULER)', detail: 'preset EXAM_60K / Pre-Warm T-45p (fan-out)', target: 'api-elb: 25->38, oauth: 15->22, Suspend ScaleIn', status: 'EXECUTED' },
++        { time: '19:15:00', actor: 'scheduler (SYSTEM_SCHEDULER)', detail: 'lambda.concurrency.set_provisioned / Provisioned Pha 1', target: 'examination-lambda Provisioned: 0 -> 1200', status: 'EXECUTED' }
+       ];
+ 
+       // DOM helpers
+@@ -1900,33 +1900,33 @@
+ 
+         // Khối 1: Preset
+         const presets = [
+-          { id: 'preset-p1', label: 'Preset ~60K Pha 1 (Prov 1.200 + ASG 50)', detail: 'ops.preset.apply', target: 'P1 19:15-19:45 (~60K)', diff: 'Lambda Prov: -> 1200\nASG api-elb: -> 50 (Suspend ScaleIn)', payload: { source: 'monitor.edmicro.io', detailType: 'ops.preset.apply', preset: 'EXAM_60K_P1', lambdaProvisioned: 1200, asgApiDesired: 50, suspendScaleIn: true }, enabled: true },
+-          { id: 'preset-30k', label: 'Preset <30K (M50 / Prov 600 / ASG 25)', detail: 'ops.preset.apply', target: 'Mốc <30K', diff: 'Lambda Prov: -> 600\nASG api-elb: -> 25', payload: { source: 'monitor.edmicro.io', detailType: 'ops.preset.apply', preset: 'EXAM_30K', lambdaProvisioned: 600, asgApiDesired: 25 }, enabled: true },
+-          { id: 'preset-standby', label: 'Hạ tải Standby (Sau 21:45)', detail: 'ops.preset.apply', target: 'Standby (Safety Gate 5/5)', diff: 'Lambda Prov: 1200 -> 0\nASG ScaleIn: Resume -> Min 2', payload: { source: 'monitor.edmicro.io', detailType: 'ops.preset.apply', preset: 'POST_EXAM_STANDBY', verifySafetyGate: true }, enabled: sf.safetyDownOk, reason: 'Chưa đủ 5/5 điều kiện Safety Gate sau 21:45' }
++          { id: 'preset-p1', label: 'Preset ~60K Pha 1 (Prov 1.200 + ASG 50)', detail: 'preset.fanout', target: 'P1 19:15-19:45 (~60K)', diff: 'Lambda Prov: -> 1200\nASG api-elb: -> 50 (Suspend ScaleIn)', payload: { preset: 'EXAM_60K_P1', lambdaProvisioned: 1200, asgApiDesired: 50, suspendScaleIn: true }, enabled: true },
++          { id: 'preset-30k', label: 'Preset <30K (M50 / Prov 600 / ASG 25)', detail: 'preset.fanout', target: 'Mốc <30K', diff: 'Lambda Prov: -> 600\nASG api-elb: -> 25', payload: { preset: 'EXAM_30K', lambdaProvisioned: 600, asgApiDesired: 25 }, enabled: true },
++          { id: 'preset-standby', label: 'Hạ tải Standby (Sau 21:45)', detail: 'preset.fanout', target: 'Standby (Safety Gate 5/5)', diff: 'Lambda Prov: 1200 -> 0\nASG ScaleIn: Resume -> Min 2', payload: { preset: 'POST_EXAM_STANDBY', verifySafetyGate: true }, enabled: sf.safetyDownOk, reason: 'Chưa đủ 5/5 điều kiện Safety Gate sau 21:45' }
+         ];
+         renderBtnGroup('ctrl-preset-buttons', presets);
+ 
+         // Khối 2: DB
+         const dbActions = [
+-          { id: 'db-check', label: 'Kiểm tra Pre-Exam Health & Rolling Update', detail: 'ops.db.control', target: 'cluster-exam & Cluster1', diff: 'Verify 3/3 Healthy, No disk rolling update, Dirty < 15%', payload: { detailType: 'ops.db.control', action: 'HEALTH_GATE_CHECK', clusters: ['cluster-exam', 'Cluster1'] }, enabled: true },
+-          { id: 'db-scale-down', label: 'Scale Down Atlas Tier (M60 -> M30/Standby)', detail: 'ops.db.control', target: 'cluster-exam (M60)', diff: 'Tier: M60 -> M30 (Qua SafetyChecker 5/5)', payload: { detailType: 'ops.db.control', action: 'SCALE_TIER', cluster: 'cluster-exam', targetTier: 'M30', safetyGate: 'PASSED_5_OF_5' }, enabled: sf.isSre && sf.safetyDownOk, reason: !sf.isSre ? 'Chỉ DEVOPS_SRE mới có quyền' : 'Khóa: Phải sau 21:45 & Dirty Cache < 15%' },
+-          { id: 'db-scale-hot', label: 'Đổi DB Tier nóng giữa giờ thi', detail: 'ops.db.control', target: 'cluster-exam', diff: 'BLOCKED BY POLICY', payload: {}, enabled: false, reason: 'CẤM TUYỆT ĐỐI: Gây ReplicaSetNoPrimary 24.3s (Sự cố 29/10)' }
++          { id: 'db-check', label: 'Kiểm tra Pre-Exam Health & Rolling Update', detail: 'atlas.rolling_status.check', target: 'cluster-exam & Cluster1', diff: 'Verify 3/3 Healthy, No disk rolling update, Dirty < 15%', payload: { action: 'HEALTH_GATE_CHECK', clusters: ['cluster-exam', 'Cluster1'] }, enabled: true },
++          { id: 'db-scale-down', label: 'Scale Down Atlas Tier (M60 -> M30/Standby)', detail: 'atlas.tier.scale', target: 'cluster-exam (M60)', diff: 'Tier: M60 -> M30 (Qua SafetyChecker 5/5)', payload: { action: 'SCALE_TIER', cluster: 'cluster-exam', targetTier: 'M30', safetyGate: 'PASSED_5_OF_5' }, enabled: sf.isSre && sf.safetyDownOk, reason: !sf.isSre ? 'Chỉ DEVOPS_SRE mới có quyền' : 'Khóa: Phải sau 21:45 & Dirty Cache < 15%' },
++          { id: 'db-scale-hot', label: 'Đổi DB Tier nóng giữa giờ thi', detail: 'atlas.tier.scale', target: 'cluster-exam', diff: 'BLOCKED BY POLICY', payload: {}, enabled: false, reason: 'CẤM TUYỆT ĐỐI: Gây ReplicaSetNoPrimary 24.3s (Sự cố 29/10)' }
+         ];
+         renderBtnGroup('ctrl-db-buttons', dbActions, 'btn-amber');
+ 
+         // Khối 3: Lambda
+         const lambdaActions = [
+-          { id: 'lam-cb-off', label: 'Circuit Breaker: Tắt event-monitor (Reserved = 0 -> SQS)', detail: 'ops.lambda.control', target: 'event-monitor', diff: `ReservedConcurrency: ${sc.eventMonRes} -> 0\nSQS Buffering: ENABLED`, payload: { detailType: 'ops.lambda.control', functionName: 'event-monitor', reservedConcurrency: 0, reason: 'SOP_S1_PROTECT_DB_IOPS' }, enabled: true, cls: 'btn-red' },
+-          { id: 'lam-cb-on', label: 'Khôi phục event-monitor (Reserved = 50 xả SQS)', detail: 'ops.lambda.control', target: 'event-monitor', diff: 'ReservedConcurrency: 0 -> 50 (Drain SQS chậm)', payload: { detailType: 'ops.lambda.control', functionName: 'event-monitor', reservedConcurrency: 50 }, enabled: sf.safetyDownOk || !sf.dbRedOrAmber, reason: 'DB đang căng thẳng, chưa nên xả SQS' },
+-          { id: 'lam-prov-up', label: 'Tăng Provisioned examination-lambda (1200 -> 1800)', detail: 'ops.lambda.control', target: 'examination-lambda', diff: `ProvisionedConcurrency: ${scale.lambdaProv} -> 1800`, payload: { detailType: 'ops.lambda.control', functionName: 'examination-lambda', provisionedConcurrency: 1800 }, enabled: sf.isSre, reason: 'Chỉ DEVOPS_SRE mới được tăng Provisioned đột xuất' }
++          { id: 'lam-cb-off', label: 'Circuit Breaker: Tắt event-monitor (Reserved = 0 -> SQS)', detail: 'lambda.circuit_breaker.mute_event_monitor', target: 'event-monitor', diff: `ReservedConcurrency: ${sc.eventMonRes} -> 0\nSQS Buffering: ENABLED`, payload: { functionName: 'event-monitor', reservedConcurrency: 0, reason: 'SOP_S1_PROTECT_DB_IOPS' }, enabled: true, cls: 'btn-red' },
++          { id: 'lam-cb-on', label: 'Khôi phục event-monitor (Reserved = 50 xả SQS)', detail: 'lambda.circuit_breaker.mute_event_monitor', target: 'event-monitor', diff: 'ReservedConcurrency: 0 -> 50 (Drain SQS chậm)', payload: { functionName: 'event-monitor', reservedConcurrency: 50 }, enabled: sf.safetyDownOk || !sf.dbRedOrAmber, reason: 'DB đang căng thẳng, chưa nên xả SQS' },
++          { id: 'lam-prov-up', label: 'Tăng Provisioned examination-lambda (1200 -> 1800)', detail: 'lambda.concurrency.set_provisioned', target: 'examination-lambda', diff: `ProvisionedConcurrency: ${scale.lambdaProv} -> 1800`, payload: { functionName: 'examination-lambda', provisionedConcurrency: 1800 }, enabled: false && sf.isSre, reason: 'Vượt giới hạn cứng Provisioned ≤ 1.200' }
+         ];
+         renderBtnGroup('ctrl-lambda-buttons', lambdaActions);
+ 
+         // Khối 4: EC2 & Edge
+         const ec2Actions = [
+-          { id: 'ec2-scale-60', label: 'Mở trần EC2 api-elb (50 -> 60 VMs, Max 70)', detail: 'ops.ec2.asg.control', target: 'ASG api-elb', diff: `Desired: ${sc.apiDesired} -> 60 | Max: 70`, payload: { detailType: 'ops.ec2.asg.control', asgName: 'api-elb', desiredCapacity: 60, maxSize: 70 }, enabled: sf.canScaleOutEc2, reason: 'Interlock KHÓA: DB đang Vàng/Đỏ — Cấm thêm Web VM' },
+-          { id: 'edge-wr-on', label: 'Bật Cloudflare Waiting Room (Làm phẳng 500/phút)', detail: 'ops.ec2.asg.control', target: 'Cloudflare Waiting Room', diff: 'Status: BYPASS -> ACTIVE (500 users/min)', payload: { detailType: 'ops.edge.control', provider: 'cloudflare', waitingRoom: 'ACTIVE', newUsersPerMinute: 500 }, enabled: true, cls: 'btn-amber' },
+-          { id: 'edge-wr-off', label: 'Tắt Cloudflare Waiting Room (Bypass)', detail: 'ops.ec2.asg.control', target: 'Cloudflare Waiting Room', diff: 'Status: ACTIVE -> BYPASS', payload: { detailType: 'ops.edge.control', provider: 'cloudflare', waitingRoom: 'BYPASS' }, enabled: true, cls: 'btn-green' }
++          { id: 'ec2-scale-60', label: 'Mở trần EC2 api-elb (50 -> 60 VMs, Max 70)', detail: 'asg.capacity.update', target: 'ASG api-elb', diff: `Desired: ${sc.apiDesired} -> 60 | Max: 70`, payload: { asgName: 'api-elb', desiredCapacity: 60, maxSize: 70 }, enabled: sf.canScaleOutEc2, reason: 'Interlock KHÓA: DB đang Vàng/Đỏ — Cấm thêm Web VM' },
++          { id: 'edge-wr-on', label: 'Bật Cloudflare Waiting Room (Làm phẳng 500/phút)', detail: 'cloudflare.waiting_room.toggle', target: 'Cloudflare Waiting Room', diff: 'Status: BYPASS -> ACTIVE (500 users/min)', payload: { provider: 'cloudflare', waitingRoom: 'ACTIVE', newUsersPerMinute: 500 }, enabled: true, cls: 'btn-amber' },
++          { id: 'edge-wr-off', label: 'Tắt Cloudflare Waiting Room (Bypass)', detail: 'cloudflare.waiting_room.toggle', target: 'Cloudflare Waiting Room', diff: 'Status: ACTIVE -> BYPASS', payload: { provider: 'cloudflare', waitingRoom: 'BYPASS' }, enabled: true, cls: 'btn-green' }
+         ];
+         renderBtnGroup('ctrl-ec2-buttons', ec2Actions);
+       }
+@@ -1939,10 +1939,14 @@
+           btn.type = 'button';
+           btn.className = `btn ${item.cls || defaultCls}`;
+           btn.textContent = item.label;
+-          btn.disabled = !item.enabled;
+-          if (!item.enabled && item.reason) {
+-            btn.title = item.reason;
+-            btn.textContent += ` [Khóa: ${item.reason}]`;
++          // RBAC (spec §7.1): L1 chỉ ACK/Mute/Yêu cầu L2 — mọi nút hạ tầng bị khóa
++          const l1Locked = currentRole !== 'DEVOPS_SRE';
++          const enabled = item.enabled && !l1Locked;
++          const reason = l1Locked ? 'Chỉ DEVOPS_SRE — L1 dùng nút Yêu cầu L2 kích hoạt SOP' : item.reason;
++          btn.disabled = !enabled;
++          if (!enabled && reason) {
++            btn.title = reason;
++            btn.textContent += ` [Khóa: ${reason}]`;
+           }
+           btn.addEventListener('click', () => openConfirmDialog(item));
+           box.appendChild(btn);
+@@ -2001,9 +2005,9 @@
+         $('dlg-diff').textContent = action.diff;
+         const fullPayload = {
+           EventBusName: 'edmicro-exam-ops-bus',
+-          Source: 'monitor.edmicro.io',
++          Source: 'edmicro.monitor.control',
+           DetailType: action.detail,
+-          Detail: Object.assign({ actorRole: currentRole, dryRun: isDry, timestamp: new Date().toISOString() }, action.payload)
++          Detail: Object.assign({ schema_version: '2.0', action_id: 'act-demo-' + Date.now(), role: currentRole, dry_run: isDry, requested_at_utc: new Date().toISOString() }, action.payload)
+         };
+         $('dlg-payload').textContent = JSON.stringify(fullPayload, null, 2);
+         $('dlg-confirm-btn').textContent = isDry ? 'Chạy Dry-Run (Không đổi hệ thống)' : 'Xác nhận Gửi EventBridge';
+@@ -2021,7 +2025,7 @@
+             actor: `demo-user (${currentRole})`,
+             detail: `${pendingAction.detail} / ${pendingAction.label}`,
+             target: pendingAction.target,
+-            status: isDry ? 'DRY_RUN' : 'EXECUTED'
++            status: isDry ? 'DRY_RUN' : 'DISPATCHED'
+           });
+           if (!isDry && pendingAction.id === 'lam-cb-off') {
+             SCENARIOS[currentScenarioKey].eventMonRes = 0;

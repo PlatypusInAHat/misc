@@ -1,0 +1,2042 @@
+{
+  "apiVersion": "dashboard.grafana.app/v1beta1",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "system-health-edu"
+  },
+  "spec": {
+    "title": "Hệ thống theo dõi sức khỏe hệ thống",
+    "uid": "system-health-edu",
+    "tags": [
+      "sức khỏe hệ thống",
+      "đăng nhập",
+      "thi",
+      "học tập",
+      "hạ tầng"
+    ],
+    "timezone": "browser",
+    "editable": true,
+    "graphTooltip": 1,
+    "refresh": "15s",
+    "schemaVersion": 39,
+    "version": 1,
+    "time": {
+      "from": "now-30m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "15s",
+        "30s",
+        "1m",
+        "5m"
+      ]
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "ds",
+          "label": "Nguồn dữ liệu",
+          "type": "datasource",
+          "query": "prometheus",
+          "current": {},
+          "hide": 0,
+          "refresh": 1,
+          "options": [],
+          "includeAll": false,
+          "multi": false
+        }
+      ]
+    },
+    "annotations": {
+      "list": []
+    },
+    "links": [],
+    "panels": [
+      {
+        "id": 1,
+        "type": "alertlist",
+        "title": "Cảnh báo đang bật",
+        "description": "Xếp theo mức độ. Hiện các cảnh báo đang Firing / Pending / No Data.",
+        "gridPos": {
+          "h": 7,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "options": {
+          "viewMode": "list",
+          "groupMode": "default",
+          "groupBy": [],
+          "maxItems": 20,
+          "sortOrder": 3,
+          "dashboardAlerts": false,
+          "alertName": "",
+          "showInstances": true,
+          "stateFilter": {
+            "firing": true,
+            "pending": true,
+            "noData": true,
+            "normal": false,
+            "error": true
+          },
+          "folder": null
+        }
+      },
+      {
+        "id": 2,
+        "type": "stat",
+        "title": "Đăng nhập",
+        "description": "GA4 trễ vài phút. Lượt đăng nhập mỗi phút (sự kiện login, cửa sổ 5 phút)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 5,
+          "x": 0,
+          "y": 7
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_event_count{event_name=\"login\",window=\"5m\"}) / 5",
+            "legendFormat": "Đăng nhập",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 1,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "value_and_name",
+          "justifyMode": "auto",
+          "orientation": "auto"
+        }
+      },
+      {
+        "id": 3,
+        "type": "stat",
+        "title": "Thi",
+        "description": "GA4 trễ vài phút. Lượt xem màn hình thi trong 5 phút",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 5,
+          "x": 5,
+          "y": 7
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_screen_views{screen=~\"ExamOnline|ExamScreen|TakeExam|TestCorePlaying|DigitalExam|Thi Ôn luyện\",window=\"5m\"})",
+            "legendFormat": "Thi",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "value_and_name",
+          "justifyMode": "auto",
+          "orientation": "auto"
+        }
+      },
+      {
+        "id": 4,
+        "type": "stat",
+        "title": "Học tập",
+        "description": "GA4 trễ vài phút. Người đang hoạt động trên web, Android, iOS (5 phút)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 5,
+          "x": 10,
+          "y": 7
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_active_users{window=\"5m\"})",
+            "legendFormat": "Học tập",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "value_and_name",
+          "justifyMode": "auto",
+          "orientation": "auto"
+        }
+      },
+      {
+        "id": 5,
+        "type": "stat",
+        "title": "Hạ tầng",
+        "description": "Mức dùng kết nối MongoDB (%)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 5,
+          "x": 15,
+          "y": 7
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "100 * sum(mongodb_connections_current) / (sum(mongodb_connections_current) + sum(mongodb_connections_available))",
+            "legendFormat": "Hạ tầng",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 70,
+                  "color": "orange"
+                },
+                {
+                  "value": 85,
+                  "color": "red"
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "value_and_name",
+          "justifyMode": "auto",
+          "orientation": "auto"
+        }
+      },
+      {
+        "id": 6,
+        "type": "stat",
+        "title": "Lỗi máy chủ (%)",
+        "description": "Tỉ lệ 5xx ở load balancer",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 4,
+          "x": 20,
+          "y": 7
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum) / sum(aws_applicationelb_request_count_sum)",
+            "legendFormat": "Lỗi máy chủ (%)",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 2,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 0.5,
+                  "color": "orange"
+                },
+                {
+                  "value": 1,
+                  "color": "red"
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "value_and_name",
+          "justifyMode": "auto",
+          "orientation": "auto"
+        }
+      },
+      {
+        "id": 7,
+        "type": "row",
+        "title": "Đăng nhập · Học sinh, giáo viên vào hệ thống",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 12
+        }
+      },
+      {
+        "id": 8,
+        "type": "timeseries",
+        "title": "Lượt đăng nhập (lượt/phút)",
+        "description": "GA4 trễ vài phút. Từ sự kiện login của GA4. Giảm đột ngột so với tuần trước = người dùng không vào được",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 13
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_event_count{event_name=\"login\",window=\"5m\"}) / 5",
+            "legendFormat": "Hôm nay",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_event_count{event_name=\"login\",window=\"5m\"} offset 1w) / 5",
+            "legendFormat": "Cùng giờ tuần trước",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 1,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Cùng giờ tuần trước"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#A0A0A0"
+                  }
+                },
+                {
+                  "id": "custom.lineStyle",
+                  "value": {
+                    "fill": "dash",
+                    "dash": [
+                      8,
+                      6
+                    ]
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 0
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 9,
+        "type": "timeseries",
+        "title": "Thời gian đăng nhập (giây) [chờ Kỹ thuật bổ sung metric]",
+        "description": "Từ lúc bấm Đăng nhập đến lúc vào được trang chính. Cần ứng dụng xuất histogram thời gian đăng nhập.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 13
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "histogram_quantile(0.95, sum by (le) (rate(login_duration_seconds_bucket[5m])))",
+            "legendFormat": "Thời gian chờ p95",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "decimals": 1,
+            "min": 0,
+            "noValue": "Chờ bổ sung metric",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 2,
+                  "color": "orange"
+                },
+                {
+                  "value": 5,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 10,
+        "type": "timeseries",
+        "title": "Đăng nhập thất bại (%) [chờ Kỹ thuật bổ sung metric]",
+        "description": "Tỉ lệ lần đăng nhập bị báo lỗi. Cần ứng dụng xuất số lần đăng nhập thành công và thất bại.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 13
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "100 * sum(rate(login_requests_total{status=\"failed\"}[5m])) / sum(rate(login_requests_total[5m]))",
+            "legendFormat": "Thất bại",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 1,
+            "min": 0,
+            "noValue": "Chờ bổ sung metric",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 2,
+                  "color": "orange"
+                },
+                {
+                  "value": 5,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 11,
+        "type": "timeseries",
+        "title": "Mở màn đăng nhập so với đăng nhập được",
+        "description": "GA4 trễ vài phút. Lượt mở màn SignIn* (5 phút) và số sự kiện login. Hai đường lệch xa nhau = nhiều người không đăng nhập được.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 13
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_screen_views{screen=~\"SignIn|SignInHaiPhong|SignInHanoi|SignInTpHCM\",window=\"5m\"})",
+            "legendFormat": "Lượt mở màn đăng nhập",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_event_count{event_name=\"login\",window=\"5m\"})",
+            "legendFormat": "Đăng nhập được",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 12,
+        "type": "row",
+        "title": "Thi · Làm bài và nộp bài thi trực tuyến",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 21
+        }
+      },
+      {
+        "id": 13,
+        "type": "timeseries",
+        "title": "Lượt xem màn hình thi",
+        "description": "GA4 trễ vài phút. Số lượt xem các màn thi trong 5 phút (thay cho số học sinh đang thi)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 22
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_screen_views{screen=~\"ExamOnline|ExamScreen|TakeExam|TestCorePlaying|DigitalExam|Thi Ôn luyện\",window=\"5m\"})",
+            "legendFormat": "Màn hình thi",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 14,
+        "type": "timeseries",
+        "title": "Thời gian lưu và nộp bài (giây) [chờ Kỹ thuật bổ sung metric]",
+        "description": "Ngưỡng theo thao tác Nộp bài. Cần ứng dụng xuất thời gian lưu và nộp bài.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 22
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "histogram_quantile(0.95, sum by (le) (rate(exam_submit_duration_seconds_bucket[5m])))",
+            "legendFormat": "Nộp bài",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "histogram_quantile(0.95, sum by (le) (rate(exam_save_duration_seconds_bucket[5m])))",
+            "legendFormat": "Lưu câu trả lời",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "decimals": 2,
+            "min": 0,
+            "noValue": "Chờ bổ sung metric",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 1,
+                  "color": "orange"
+                },
+                {
+                  "value": 2.5,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 15,
+        "type": "timeseries",
+        "title": "Học sinh gặp lỗi khi thi (%) [chờ Kỹ thuật bổ sung metric]",
+        "description": "Tỉ lệ thao tác lưu/nộp nhận về lỗi. Cần ứng dụng xuất số request thi theo mã trạng thái.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 22
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "100 * sum(rate(exam_requests_total{status=~\"5..\"}[5m])) / sum(rate(exam_requests_total[5m]))",
+            "legendFormat": "Lỗi",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 2,
+            "min": 0,
+            "noValue": "Chờ bổ sung metric",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 0.3,
+                  "color": "orange"
+                },
+                {
+                  "value": 1,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 16,
+        "type": "timeseries",
+        "title": "Nộp bài thành công và sự cố ứng dụng",
+        "description": "GA4 trễ vài phút. Lượt vào màn SubmissionSuccessScreen và số sự kiện app_exception (5 phút)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 22
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_screen_views{screen=\"SubmissionSuccessScreen\",window=\"5m\"})",
+            "legendFormat": "Nộp bài thành công",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_event_count{event_name=\"app_exception\",window=\"5m\"})",
+            "legendFormat": "Sự cố ứng dụng",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 17,
+        "type": "row",
+        "title": "Học tập · Xem bài học, làm bài tập, luyện tập",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 30
+        }
+      },
+      {
+        "id": 18,
+        "type": "timeseries",
+        "title": "Người đang học",
+        "description": "GA4 trễ vài phút. Người đang hoạt động (5 phút), so với cùng giờ tuần trước",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 31
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_active_users{window=\"5m\"})",
+            "legendFormat": "Hôm nay",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(ga4_active_users{window=\"5m\"} offset 1w)",
+            "legendFormat": "Cùng giờ tuần trước",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Cùng giờ tuần trước"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#A0A0A0"
+                  }
+                },
+                {
+                  "id": "custom.lineStyle",
+                  "value": {
+                    "fill": "dash",
+                    "dash": [
+                      8,
+                      6
+                    ]
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 0
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 19,
+        "type": "timeseries",
+        "title": "Thời gian tải bài học (giây) [chờ Kỹ thuật bổ sung metric]",
+        "description": "Mở bài giảng, video, đề luyện tập. Cần ứng dụng xuất thời gian tải.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 31
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "histogram_quantile(0.95, sum by (le) (rate(learn_load_duration_seconds_bucket[5m])))",
+            "legendFormat": "Thời gian tải p95",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "decimals": 1,
+            "min": 0,
+            "noValue": "Chờ bổ sung metric",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 3,
+                  "color": "orange"
+                },
+                {
+                  "value": 6,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 20,
+        "type": "timeseries",
+        "title": "Lỗi khi học/nộp bài tập (%) [chờ Kỹ thuật bổ sung metric]",
+        "description": "Tỉ lệ thao tác bị báo lỗi. Cần ứng dụng xuất số request học tập theo mã trạng thái.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 31
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "100 * sum(rate(learn_requests_total{status=~\"5..\"}[5m])) / sum(rate(learn_requests_total[5m]))",
+            "legendFormat": "Lỗi",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 2,
+            "min": 0,
+            "noValue": "Chờ bổ sung metric",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 0.5,
+                  "color": "orange"
+                },
+                {
+                  "value": 2,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 21,
+        "type": "timeseries",
+        "title": "Hoạt động học tập",
+        "description": "GA4 trễ vài phút. Số sự kiện luyện tập và xem video trong 5 phút",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 31
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum by (event_name) (ga4_event_count{event_name=~\"Practice_START|Practice_DONE|video_start|video_complete\",window=\"5m\"})",
+            "legendFormat": "{{event_name}}",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 22,
+        "type": "row",
+        "title": "Hạ tầng · Tín hiệu sớm: máy chủ đầy dần trước khi người dùng thấy chậm",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 39
+        }
+      },
+      {
+        "id": 23,
+        "type": "timeseries",
+        "title": "Lưu lượng truy cập (nghìn yêu cầu/chu kỳ)",
+        "description": "Từ load balancer qua CloudWatch (yace), so với cùng giờ tuần trước",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 0,
+          "y": 40
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(aws_applicationelb_request_count_sum) / 1000",
+            "legendFormat": "Hôm nay",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(aws_applicationelb_request_count_sum offset 1w) / 1000",
+            "legendFormat": "Cùng giờ tuần trước",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 2,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Cùng giờ tuần trước"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#A0A0A0"
+                  }
+                },
+                {
+                  "id": "custom.lineStyle",
+                  "value": {
+                    "fill": "dash",
+                    "dash": [
+                      8,
+                      6
+                    ]
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 0
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 24,
+        "type": "timeseries",
+        "title": "Lỗi máy chủ (%)",
+        "description": "Tỉ lệ yêu cầu bị máy chủ trả lỗi 5xx ở load balancer",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 8,
+          "y": 40
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum) / sum(aws_applicationelb_request_count_sum)",
+            "legendFormat": "Lỗi máy chủ",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 2,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 0.5,
+                  "color": "orange"
+                },
+                {
+                  "value": 1,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 25,
+        "type": "timeseries",
+        "title": "Mức tải hệ thống (%)",
+        "description": "Trên 70%: căng · trên 85%: dễ chậm/lỗi. Chưa tách riêng máy chủ thi và máy chủ đăng nhập.",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 16,
+          "y": 40
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "100 * sum(mongodb_connections_current) / (sum(mongodb_connections_current) + sum(mongodb_connections_available))",
+            "legendFormat": "Kết nối MongoDB",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "avg(aws_ec2_cpuutilization_average)",
+            "legendFormat": "CPU EC2 trung bình",
+            "refId": "B",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "max(aws_ec2_cpuutilization_maximum)",
+            "legendFormat": "CPU EC2 cao nhất",
+            "refId": "C",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 70,
+                  "color": "orange"
+                },
+                {
+                  "value": 85,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            },
+            "max": 100
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 26,
+        "type": "row",
+        "title": "Hạ tầng (2) · Thời gian phản hồi và trạng thái",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 48
+        }
+      },
+      {
+        "id": 27,
+        "type": "timeseries",
+        "title": "Thời gian phản hồi của máy chủ (giây)",
+        "description": "p95 từ load balancer",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 0,
+          "y": 49
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "max(aws_applicationelb_target_response_time_p95)",
+            "legendFormat": "p95",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "max(aws_applicationelb_target_response_time_maximum)",
+            "legendFormat": "Cao nhất",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "decimals": 2,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                },
+                {
+                  "value": 1,
+                  "color": "orange"
+                },
+                {
+                  "value": 3,
+                  "color": "red"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 28,
+        "type": "timeseries",
+        "title": "Máy chủ khỏe / không khỏe",
+        "description": "Số máy chủ đang khỏe và không khỏe sau load balancer",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 8,
+          "y": 49
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(aws_applicationelb_healthy_host_count_minimum)",
+            "legendFormat": "Khỏe",
+            "refId": "A",
+            "range": true
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "sum(aws_applicationelb_un_healthy_host_count_maximum)",
+            "legendFormat": "Không khỏe",
+            "refId": "B",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      },
+      {
+        "id": 29,
+        "type": "timeseries",
+        "title": "Kiểm tra từ bên ngoài (probe)",
+        "description": "Trạng thái các địa chỉ web được kiểm tra: 1 = lên, 0 = xuống",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 16,
+          "y": 49
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${ds}"
+            },
+            "expr": "probe_success",
+            "legendFormat": "{{instance}}",
+            "refId": "A",
+            "range": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 0,
+            "min": 0,
+            "noValue": "Mất dữ liệu",
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#1B96FF"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": -1000000000,
+                  "color": "blue"
+                }
+              ]
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 12,
+              "showPoints": "never",
+              "spanNulls": false,
+              "gradientMode": "none",
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "max": 1
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          }
+        }
+      }
+    ]
+  }
+}

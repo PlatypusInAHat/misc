@@ -1,0 +1,5179 @@
+{
+  "uid": "exam-monitor-overview",
+  "title": "Giám sát Kỳ thi — Overview",
+  "description": "Chỉ dùng metric có trong Prometheus (metrics.txt): YACE aws_*, Atlas mongodb_*/hardware_*, ga4_*, probe_*, ALERTS. Ngưỡng theo docs/specs/dashboard-metrics-dictionary.md.",
+  "tags": [
+    "exam",
+    "overview",
+    "monitor.edmicro.io"
+  ],
+  "timezone": "Asia/Ho_Chi_Minh",
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-2h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "15s",
+      "30s",
+      "1m"
+    ]
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "schemaVersion": 39,
+  "version": 3,
+  "links": [
+    {
+      "title": "Bảng Điều Khiển (SRE)",
+      "type": "link",
+      "url": "https://monitor.edmicro.io/control?role=sre",
+      "icon": "external link",
+      "targetBlank": true
+    },
+    {
+      "title": "Từ điển chỉ số",
+      "type": "link",
+      "icon": "doc",
+      "targetBlank": true,
+      "url": "https://gitlab.edmicro.io/devsecops/live-exam-noc/-/blob/master/docs/specs/dashboard-metrics-dictionary.md"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "purple",
+        "name": "Pha thi (P1/P2/Nộp bài)",
+        "target": {
+          "type": "tags",
+          "tags": [
+            "exam-phase"
+          ],
+          "limit": 100,
+          "matchAny": true
+        }
+      }
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "type": "datasource",
+        "name": "ds",
+        "label": "Prometheus",
+        "query": "prometheus",
+        "hide": 0,
+        "current": {},
+        "options": [],
+        "refresh": 1,
+        "regex": "",
+        "includeAll": false,
+        "multi": false
+      },
+      {
+        "type": "textbox",
+        "name": "exam_session",
+        "label": "Ca thi",
+        "hide": 0,
+        "query": "Ca thi",
+        "current": {
+          "text": "Ca thi",
+          "value": "Ca thi"
+        },
+        "options": []
+      },
+      {
+        "type": "query",
+        "name": "cluster",
+        "label": "Cụm Mongo",
+        "hide": 0,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "query": {
+          "query": "label_values(mongodb_connections_current, cl_name)",
+          "refId": "cluster",
+          "qryType": 1
+        },
+        "definition": "label_values(mongodb_connections_current, cl_name)",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "options": []
+      },
+      {
+        "type": "query",
+        "name": "cluster_exam",
+        "label": "Cụm thi (Gate)",
+        "hide": 0,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "query": {
+          "query": "label_values(mongodb_connections_current, cl_name)",
+          "refId": "cluster_exam",
+          "qryType": 1
+        },
+        "definition": "label_values(mongodb_connections_current, cl_name)",
+        "multi": false,
+        "includeAll": false,
+        "allValue": null,
+        "current": {
+          "text": "cluster-exam",
+          "value": "cluster-exam"
+        },
+        "options": []
+      },
+      {
+        "type": "query",
+        "name": "lambda",
+        "label": "Lambda",
+        "hide": 0,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "query": {
+          "query": "label_values(aws_lambda_invocations_sum, dimension_FunctionName)",
+          "refId": "lambda",
+          "qryType": 1
+        },
+        "definition": "label_values(aws_lambda_invocations_sum, dimension_FunctionName)",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "examination-lambda",
+            "examination-lambda-oauth",
+            "event-monitor"
+          ],
+          "value": [
+            "examination-lambda",
+            "examination-lambda-oauth",
+            "event-monitor"
+          ]
+        },
+        "options": []
+      },
+      {
+        "type": "query",
+        "name": "asg",
+        "label": "ASG",
+        "hide": 0,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "query": {
+          "query": "label_values(aws_autoscaling_group_desired_capacity_average, dimension_AutoScalingGroupName)",
+          "refId": "asg",
+          "qryType": 1
+        },
+        "definition": "label_values(aws_autoscaling_group_desired_capacity_average, dimension_AutoScalingGroupName)",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "api-demand-spot-auto-scaling-group",
+            "oauth-spot-medium-auto-scaling-group",
+            "datawrk-onluyen-vn"
+          ],
+          "value": [
+            "api-demand-spot-auto-scaling-group",
+            "oauth-spot-medium-auto-scaling-group",
+            "datawrk-onluyen-vn"
+          ]
+        },
+        "options": []
+      },
+      {
+        "type": "query",
+        "name": "alb",
+        "label": "ALB",
+        "hide": 0,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "query": {
+          "query": "label_values(aws_applicationelb_request_count_sum, dimension_LoadBalancer)",
+          "refId": "alb",
+          "qryType": 1
+        },
+        "definition": "label_values(aws_applicationelb_request_count_sum, dimension_LoadBalancer)",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "app/API-Onluyen-Spot-Load-Balancer/3df22073363e0fec",
+            "app/OAUTH-Onluyen-Spot-Load-Balancer/69ddc2ef4c4e7b0c",
+            "app/GATEWAY-API-EDMICRO-ALB/d309903ee35f97ad"
+          ],
+          "value": [
+            "app/API-Onluyen-Spot-Load-Balancer/3df22073363e0fec",
+            "app/OAUTH-Onluyen-Spot-Load-Balancer/69ddc2ef4c4e7b0c",
+            "app/GATEWAY-API-EDMICRO-ALB/d309903ee35f97ad"
+          ]
+        },
+        "options": []
+      },
+      {
+        "type": "custom",
+        "name": "lambda_reserved_exam",
+        "label": "Reserved examination",
+        "hide": 0,
+        "query": "Standby : 200, <5K : 500, <10K : 1000, <30K : 2000, ~60K : 3000",
+        "options": [
+          {
+            "text": "Standby",
+            "value": "200",
+            "selected": false
+          },
+          {
+            "text": "<5K",
+            "value": "500",
+            "selected": false
+          },
+          {
+            "text": "<10K",
+            "value": "1000",
+            "selected": false
+          },
+          {
+            "text": "<30K",
+            "value": "2000",
+            "selected": false
+          },
+          {
+            "text": "~60K",
+            "value": "3000",
+            "selected": true
+          }
+        ],
+        "current": {
+          "text": "~60K",
+          "value": "3000"
+        }
+      },
+      {
+        "type": "custom",
+        "name": "lambda_reserved_oauth",
+        "label": "Reserved oauth",
+        "hide": 0,
+        "query": "Standby : 50, <5K : 100, <10K : 200, <30K : 300, ~60K : 500",
+        "options": [
+          {
+            "text": "Standby",
+            "value": "50",
+            "selected": false
+          },
+          {
+            "text": "<5K",
+            "value": "100",
+            "selected": false
+          },
+          {
+            "text": "<10K",
+            "value": "200",
+            "selected": false
+          },
+          {
+            "text": "<30K",
+            "value": "300",
+            "selected": false
+          },
+          {
+            "text": "~60K",
+            "value": "500",
+            "selected": true
+          }
+        ],
+        "current": {
+          "text": "~60K",
+          "value": "500"
+        }
+      },
+      {
+        "type": "custom",
+        "name": "max_iops",
+        "label": "Trần IOPS",
+        "hide": 0,
+        "query": "M60 10K : 10000, M80 14K : 14000, gp3 3K : 3000",
+        "options": [
+          {
+            "text": "M60 10K",
+            "value": "10000",
+            "selected": true
+          },
+          {
+            "text": "M80 14K",
+            "value": "14000",
+            "selected": false
+          },
+          {
+            "text": "gp3 3K",
+            "value": "3000",
+            "selected": false
+          }
+        ],
+        "current": {
+          "text": "M60 10K",
+          "value": "10000"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Tổng quan & Cổng an toàn",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "id": 1
+    },
+    {
+      "type": "text",
+      "title": "",
+      "options": {
+        "mode": "markdown",
+        "content": "### ${exam_session}\nCụm thi: **${cluster_exam}** · Cập nhật: **${__to:date:HH:mm:ss}** (giờ VN)\n\n[⚙ Bảng Điều Khiển (SRE)](https://monitor.edmicro.io/control?role=sre) · [Trực Thi](https://monitor.edmicro.io/control?role=duty)"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 5,
+        "h": 5
+      },
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "Trạng thái tổng",
+      "description": "Mức cao nhất của: điều kiện Scaling Gate trên cụm thi, Lambda throttles (> 0 Vàng, > 10 Đỏ), ALB 5xx % (> 0,1% Vàng, > 1% Đỏ).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "clamp_max((max(max by (cl_name) (hardware_system_cpu_normalized_user_percent{cl_name=~\"$cluster_exam\"} + hardware_system_cpu_normalized_kernel_percent{cl_name=~\"$cluster_exam\"})) >= bool 75) + (100 * max(max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster_exam\"})) / $max_iops >= bool 80) + (max(max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster_exam\"})) >= bool 25000) + (max(100 * max by (cl_name) (mongodb_wiredTiger_cache_tracked_dirty_bytes_in_the_cache{cl_name=~\"$cluster_exam\"} / mongodb_wiredTiger_cache_maximum_bytes_configured{cl_name=~\"$cluster_exam\"})) >= bool 20) + (max(max by (cl_name) (mongodb_globalLock_currentQueue_writers{cl_name=~\"$cluster_exam\"})) > bool 10) + (min(min by (cl_name) (mongodb_queues_execution_write_available{cl_name=~\"$cluster_exam\"})) < bool 32) + (max(max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster_exam\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster_exam\"}[2m]), 1)) / 1000) > bool 30) + (max(60 * max by (cl_name) (rate(mongodb_connections_totalCreated{cl_name=~\"$cluster_exam\"}[2m]))) > bool 5000) + ((sum(aws_lambda_throttles_sum{dimension_FunctionName=~\"$lambda\"}) or vector(0)) > bool 10) + ((100 * (sum(sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\"})) or vector(0)) / clamp_min(sum(sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\"})), 1)) > bool 1 or vector(0)), 1) * 2 + clamp_max((max(max by (cl_name) (hardware_system_cpu_normalized_user_percent{cl_name=~\"$cluster_exam\"} + hardware_system_cpu_normalized_kernel_percent{cl_name=~\"$cluster_exam\"})) >= bool 65) + (100 * max(max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster_exam\"})) / $max_iops >= bool 70) + (max(max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster_exam\"})) >= bool 15000) + (max(100 * max by (cl_name) (mongodb_wiredTiger_cache_tracked_dirty_bytes_in_the_cache{cl_name=~\"$cluster_exam\"} / mongodb_wiredTiger_cache_maximum_bytes_configured{cl_name=~\"$cluster_exam\"})) >= bool 15) + (max(max by (cl_name) (mongodb_globalLock_currentQueue_writers{cl_name=~\"$cluster_exam\"})) > bool 0) + (min(min by (cl_name) (mongodb_queues_execution_write_available{cl_name=~\"$cluster_exam\"})) < bool 96) + (max(max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster_exam\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster_exam\"}[2m]), 1)) / 1000) > bool 10) + (max(60 * max by (cl_name) (rate(mongodb_connections_totalCreated{cl_name=~\"$cluster_exam\"}[2m]))) > bool 2000) + ((sum(aws_lambda_throttles_sum{dimension_FunctionName=~\"$lambda\"}) or vector(0)) > bool 0) + ((100 * (sum(sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\"})) or vector(0)) / clamp_min(sum(sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\"})), 1)) > bool 0.1 or vector(0)), 1) * (1 - clamp_max((max(max by (cl_name) (hardware_system_cpu_normalized_user_percent{cl_name=~\"$cluster_exam\"} + hardware_system_cpu_normalized_kernel_percent{cl_name=~\"$cluster_exam\"})) >= bool 75) + (100 * max(max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster_exam\"})) / $max_iops >= bool 80) + (max(max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster_exam\"})) >= bool 25000) + (max(100 * max by (cl_name) (mongodb_wiredTiger_cache_tracked_dirty_bytes_in_the_cache{cl_name=~\"$cluster_exam\"} / mongodb_wiredTiger_cache_maximum_bytes_configured{cl_name=~\"$cluster_exam\"})) >= bool 20) + (max(max by (cl_name) (mongodb_globalLock_currentQueue_writers{cl_name=~\"$cluster_exam\"})) > bool 10) + (min(min by (cl_name) (mongodb_queues_execution_write_available{cl_name=~\"$cluster_exam\"})) < bool 32) + (max(max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster_exam\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster_exam\"}[2m]), 1)) / 1000) > bool 30) + (max(60 * max by (cl_name) (rate(mongodb_connections_totalCreated{cl_name=~\"$cluster_exam\"}[2m]))) > bool 5000) + ((sum(aws_lambda_throttles_sum{dimension_FunctionName=~\"$lambda\"}) or vector(0)) > bool 10) + ((100 * (sum(sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\"})) or vector(0)) / clamp_min(sum(sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\"})), 1)) > bool 1 or vector(0)), 1))",
+          "legendFormat": "Hệ thống",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "XANH · Bình thường",
+                  "color": "green",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "VÀNG · Cần chú ý",
+                  "color": "yellow",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "value",
+              "options": {
+                "2": {
+                  "text": "ĐỎ · Báo DevOps ngay",
+                  "color": "red",
+                  "index": 2
+                }
+              }
+            }
+          ],
+          "noValue": "KHÔNG RÕ",
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 5,
+        "y": 1,
+        "w": 4,
+        "h": 5
+      },
+      "id": 3
+    },
+    {
+      "type": "stat",
+      "title": "Khóa Tăng Server (Scaling Gate)",
+      "description": "TĐ 5.4 trên $cluster_exam. LOCK khi: CPU ≥ 75%, Write IOPS ≥ 80% trần, Conn ≥ 25K, Dirty ≥ 20%, Writers Queue > 10, vé ghi < 32, độ trễ ghi > 30 ms hoặc kết nối mới > 5.000/phút. Thiếu dữ liệu = LOCK.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "clamp_max((max(max by (cl_name) (hardware_system_cpu_normalized_user_percent{cl_name=~\"$cluster_exam\"} + hardware_system_cpu_normalized_kernel_percent{cl_name=~\"$cluster_exam\"})) >= bool 75) + (100 * max(max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster_exam\"})) / $max_iops >= bool 80) + (max(max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster_exam\"})) >= bool 25000) + (max(100 * max by (cl_name) (mongodb_wiredTiger_cache_tracked_dirty_bytes_in_the_cache{cl_name=~\"$cluster_exam\"} / mongodb_wiredTiger_cache_maximum_bytes_configured{cl_name=~\"$cluster_exam\"})) >= bool 20) + (max(max by (cl_name) (mongodb_globalLock_currentQueue_writers{cl_name=~\"$cluster_exam\"})) > bool 10) + (min(min by (cl_name) (mongodb_queues_execution_write_available{cl_name=~\"$cluster_exam\"})) < bool 32) + (max(max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster_exam\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster_exam\"}[2m]), 1)) / 1000) > bool 30) + (max(60 * max by (cl_name) (rate(mongodb_connections_totalCreated{cl_name=~\"$cluster_exam\"}[2m]))) > bool 5000), 1) * 2 + clamp_max((max(max by (cl_name) (hardware_system_cpu_normalized_user_percent{cl_name=~\"$cluster_exam\"} + hardware_system_cpu_normalized_kernel_percent{cl_name=~\"$cluster_exam\"})) >= bool 65) + (100 * max(max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster_exam\"})) / $max_iops >= bool 70) + (max(max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster_exam\"})) >= bool 15000) + (max(100 * max by (cl_name) (mongodb_wiredTiger_cache_tracked_dirty_bytes_in_the_cache{cl_name=~\"$cluster_exam\"} / mongodb_wiredTiger_cache_maximum_bytes_configured{cl_name=~\"$cluster_exam\"})) >= bool 15) + (max(max by (cl_name) (mongodb_globalLock_currentQueue_writers{cl_name=~\"$cluster_exam\"})) > bool 0) + (min(min by (cl_name) (mongodb_queues_execution_write_available{cl_name=~\"$cluster_exam\"})) < bool 96) + (max(max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster_exam\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster_exam\"}[2m]), 1)) / 1000) > bool 10) + (max(60 * max by (cl_name) (rate(mongodb_connections_totalCreated{cl_name=~\"$cluster_exam\"}[2m]))) > bool 2000), 1) * (1 - clamp_max((max(max by (cl_name) (hardware_system_cpu_normalized_user_percent{cl_name=~\"$cluster_exam\"} + hardware_system_cpu_normalized_kernel_percent{cl_name=~\"$cluster_exam\"})) >= bool 75) + (100 * max(max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster_exam\"})) / $max_iops >= bool 80) + (max(max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster_exam\"})) >= bool 25000) + (max(100 * max by (cl_name) (mongodb_wiredTiger_cache_tracked_dirty_bytes_in_the_cache{cl_name=~\"$cluster_exam\"} / mongodb_wiredTiger_cache_maximum_bytes_configured{cl_name=~\"$cluster_exam\"})) >= bool 20) + (max(max by (cl_name) (mongodb_globalLock_currentQueue_writers{cl_name=~\"$cluster_exam\"})) > bool 10) + (min(min by (cl_name) (mongodb_queues_execution_write_available{cl_name=~\"$cluster_exam\"})) < bool 32) + (max(max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster_exam\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster_exam\"}[2m]), 1)) / 1000) > bool 30) + (max(60 * max by (cl_name) (rate(mongodb_connections_totalCreated{cl_name=~\"$cluster_exam\"}[2m]))) > bool 5000), 1))",
+          "legendFormat": "Gate",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "OK · Được tăng",
+                  "color": "green",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "CAUTION · Thận trọng",
+                  "color": "yellow",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "value",
+              "options": {
+                "2": {
+                  "text": "LOCK · Cấm tăng VM",
+                  "color": "red",
+                  "index": 2
+                }
+              }
+            }
+          ],
+          "noValue": "LOCK (Không rõ)",
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 1,
+        "w": 4,
+        "h": 5
+      },
+      "id": 4
+    },
+    {
+      "type": "stat",
+      "title": "Primary",
+      "description": "Số node writable primary mỗi cụm (mongodb_repl_isWritablePrimary). 0 = mất Primary.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (cl_name) (mongodb_repl_isWritablePrimary{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "MẤT PRIMARY",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "Có Primary",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 13,
+        "y": 1,
+        "w": 4,
+        "h": 5
+      },
+      "id": 5
+    },
+    {
+      "type": "stat",
+      "title": "Node khởi động lại gần đây",
+      "description": "TĐ 4.8 · Uptime nhỏ nhất trong cụm. < 10 phút: vừa có node restart (rolling update / failover) — khóa đổi tier.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "min by (cl_name) (mongodb_uptime{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "green",
+                "value": 3600
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 17,
+        "y": 1,
+        "w": 4,
+        "h": 5
+      },
+      "id": 6
+    },
+    {
+      "type": "stat",
+      "title": "Node khỏe",
+      "description": "mongodb_members_health nhỏ nhất: 0 = có member không khỏe.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "min by (cl_name) (mongodb_members_health{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "Đủ node",
+                  "color": "green"
+                },
+                "0": {
+                  "text": "CÓ NODE LỖI",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 1,
+        "w": 3,
+        "h": 5
+      },
+      "id": 7
+    },
+    {
+      "type": "table",
+      "title": "Cảnh báo đang bật (Prometheus ALERTS)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "ALERTS{alertstate=\"firing\"}",
+          "legendFormat": "",
+          "range": false,
+          "instant": true,
+          "hide": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "alertstate": true
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 6
+      },
+      "id": 8
+    },
+    {
+      "type": "stat",
+      "title": "Nguồn dữ liệu",
+      "description": "ga4_up, ga4_last_success_timestamp_seconds, probe_success (blackbox).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "min(ga4_up)",
+          "legendFormat": "GA4 exporter",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "time() - max(ga4_last_success_timestamp_seconds)",
+          "legendFormat": "GA4 cập nhật cách đây",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "min(probe_success)",
+          "legendFormat": "Probe HTTP",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "OK",
+                  "color": "green"
+                },
+                "0": {
+                  "text": "LỖI",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 6,
+        "h": 6
+      },
+      "id": 9
+    },
+    {
+      "type": "stat",
+      "title": "Probe endpoint",
+      "description": "Blackbox probe_success từng endpoint.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "probe_success",
+          "legendFormat": "{{instance}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 6,
+        "w": 6,
+        "h": 6
+      },
+      "id": 10
+    },
+    {
+      "type": "row",
+      "title": "Người dùng (GA4) & Cổng vào (ALB)",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 24,
+        "h": 1
+      },
+      "id": 11
+    },
+    {
+      "type": "stat",
+      "title": "Người dùng đang online (GA4)",
+      "description": "TĐ 1.1 · ga4_active_users (mỗi nhãn của exporter là một ô).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "ga4_active_users",
+          "legendFormat": "__auto",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 6,
+        "h": 6
+      },
+      "id": 12
+    },
+    {
+      "type": "bargauge",
+      "title": "Sự kiện GA4",
+      "description": "TĐ 1.2 · ga4_event_count theo sự kiện (exam_start / answer_save / exam_submit…).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "topk(8, ga4_event_count)",
+          "legendFormat": "__auto",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": null,
+          "max": null,
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "namePlacement": "left",
+        "sizing": "auto",
+        "minVizHeight": 10,
+        "maxVizHeight": 300,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 14
+        }
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 13,
+        "w": 6,
+        "h": 6
+      },
+      "id": 13
+    },
+    {
+      "type": "stat",
+      "title": "Lượt xem màn hình (GA4)",
+      "description": "ga4_screen_views.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(ga4_screen_views)",
+          "legendFormat": "Screen views",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 3,
+        "h": 6
+      },
+      "id": 14
+    },
+    {
+      "type": "stat",
+      "title": "Cổng vào ALB",
+      "description": "TĐ 1.3–1.4 · Cộng các ALB đang chọn ($alb). p95 xanh < 300 ms, đỏ > 800 ms; 5xx xanh < 0,1%, đỏ > 1%.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\"}))",
+          "legendFormat": "Request / kỳ đo",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(max by (dimension_LoadBalancer) (aws_applicationelb_target_response_time_p95{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or max by (dimension_LoadBalancer) (aws_applicationelb_target_response_time_p95{dimension_LoadBalancer=~\"$alb\"})) * 1000",
+          "legendFormat": "p95 (ms)",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * (sum(sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"$alb\"})) or vector(0)) / clamp_min(sum(sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\"})), 1)",
+          "legendFormat": "5xx %",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_elb_4_xx_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_httpcode_elb_4_xx_count_sum{dimension_LoadBalancer=~\"$alb\"}))",
+          "legendFormat": "4xx tại ALB",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p95 (ms)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 300
+                    },
+                    {
+                      "color": "red",
+                      "value": 800
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "5xx %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.1
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Request / kỳ đo"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4xx tại ALB"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 13,
+        "w": 5,
+        "h": 6
+      },
+      "id": 15
+    },
+    {
+      "type": "stat",
+      "title": "Host không khỏe sau ALB",
+      "description": "TĐ 1.7 · UnHealthyHostCount: 0 / 1 / ≥ 2. Có host lỗi thì không cho Scale In.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "label_replace(max by (dimension_LoadBalancer) (aws_applicationelb_un_healthy_host_count_maximum{dimension_LoadBalancer=~\"$alb\"}), \"lb\", \"$1\", \"dimension_LoadBalancer\", \"app/([^/]+)/.*\")",
+          "legendFormat": "{{lb}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "0",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 13,
+        "w": 4,
+        "h": 6
+      },
+      "id": 16
+    },
+    {
+      "type": "timeseries",
+      "title": "Người dùng online & Request ALB",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(ga4_active_users)",
+          "legendFormat": "Online (GA4)",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\", dimension_TargetGroup=\"\"}) or sum by (dimension_LoadBalancer) (aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$alb\"}))",
+          "legendFormat": "Request / kỳ đo",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Request / kỳ đo"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 12,
+        "h": 8
+      },
+      "id": 17
+    },
+    {
+      "type": "timeseries",
+      "title": "Độ trễ p95 theo ALB",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "label_replace(max by (dimension_LoadBalancer) (aws_applicationelb_target_response_time_p95{dimension_LoadBalancer=~\"$alb\"}) * 1000, \"lb\", \"$1\", \"dimension_LoadBalancer\", \"app/([^/]+)/.*\")",
+          "legendFormat": "{{lb}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector(800)",
+          "legendFormat": "Ngưỡng đỏ 800 ms",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ngưỡng đỏ 800 ms"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 19,
+        "w": 12,
+        "h": 8
+      },
+      "id": 18
+    },
+    {
+      "type": "row",
+      "title": "AWS Lambda",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 1
+      },
+      "id": 19
+    },
+    {
+      "type": "bargauge",
+      "title": "Concurrency so với Reserved",
+      "description": "TĐ 2.1 · xanh < 75%, đỏ > 90% Reserved.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * max(aws_lambda_concurrent_executions_maximum{dimension_FunctionName=\"examination-lambda\"}) / $lambda_reserved_exam",
+          "legendFormat": "examination-lambda",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * max(aws_lambda_concurrent_executions_maximum{dimension_FunctionName=\"examination-lambda-oauth\"}) / $lambda_reserved_oauth",
+          "legendFormat": "examination-lambda-oauth",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "namePlacement": "left",
+        "sizing": "auto",
+        "minVizHeight": 10,
+        "maxVizHeight": 300,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 14
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 6,
+        "h": 6
+      },
+      "id": 20
+    },
+    {
+      "type": "stat",
+      "title": "Concurrency hiện tại",
+      "description": "ConcurrentExecutions từng hàm và UnreservedConcurrentExecutions toàn account.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_FunctionName) (aws_lambda_concurrent_executions_maximum{dimension_FunctionName=~\"$lambda\"})",
+          "legendFormat": "{{dimension_FunctionName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(aws_lambda_unreserved_concurrent_executions_maximum)",
+          "legendFormat": "Unreserved (account)",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 28,
+        "w": 5,
+        "h": 6
+      },
+      "id": 21
+    },
+    {
+      "type": "stat",
+      "title": "Throttles / kỳ đo",
+      "description": "TĐ 2.3 · 0 / 1–10 / > 10. Đỏ → SOP S4.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (dimension_FunctionName) (aws_lambda_throttles_sum{dimension_FunctionName=~\"$lambda\"})",
+          "legendFormat": "{{dimension_FunctionName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 11
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "0",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 11,
+        "y": 28,
+        "w": 4,
+        "h": 6
+      },
+      "id": 22
+    },
+    {
+      "type": "stat",
+      "title": "Thời gian xử lý p95",
+      "description": "TĐ 2.4 · xanh < 1,5 s, đỏ > 4 s.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_FunctionName) (aws_lambda_duration_p95{dimension_FunctionName=~\"$lambda\"})",
+          "legendFormat": "{{dimension_FunctionName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1500
+              },
+              {
+                "color": "red",
+                "value": 4000
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 28,
+        "w": 5,
+        "h": 6
+      },
+      "id": 23
+    },
+    {
+      "type": "stat",
+      "title": "Lỗi / kỳ đo",
+      "description": "aws_lambda_errors_sum.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (dimension_FunctionName) (aws_lambda_errors_sum{dimension_FunctionName=~\"$lambda\"})",
+          "legendFormat": "{{dimension_FunctionName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "0",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 28,
+        "w": 4,
+        "h": 6
+      },
+      "id": 24
+    },
+    {
+      "type": "timeseries",
+      "title": "Lambda Concurrency (có đường trần)",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_FunctionName) (aws_lambda_concurrent_executions_maximum{dimension_FunctionName=~\"$lambda\"})",
+          "legendFormat": "{{dimension_FunctionName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector($lambda_reserved_exam)",
+          "legendFormat": "Trần Reserved examination",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector(1200)",
+          "legendFormat": "Provisioned 1.200",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trần Reserved examination"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Provisioned 1.200"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    4,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 12,
+        "h": 8
+      },
+      "id": 25
+    },
+    {
+      "type": "timeseries",
+      "title": "Invocations & Throttles",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (dimension_FunctionName) (aws_lambda_invocations_sum{dimension_FunctionName=~\"$lambda\"})",
+          "legendFormat": "{{dimension_FunctionName}} invocations",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (dimension_FunctionName) (aws_lambda_throttles_sum{dimension_FunctionName=~\"$lambda\"})",
+          "legendFormat": "{{dimension_FunctionName}} throttles",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 6,
+        "h": 8
+      },
+      "id": 26
+    },
+    {
+      "type": "timeseries",
+      "title": "Duration p50 / p95 / Max (examination)",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(aws_lambda_duration_p50{dimension_FunctionName=\"examination-lambda\"})",
+          "legendFormat": "p50",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(aws_lambda_duration_p95{dimension_FunctionName=\"examination-lambda\"})",
+          "legendFormat": "p95",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(aws_lambda_duration_maximum{dimension_FunctionName=\"examination-lambda\"})",
+          "legendFormat": "Max",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector(20000)",
+          "legendFormat": "Timeout 20 s",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Timeout 20 s"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 34,
+        "w": 6,
+        "h": 8
+      },
+      "id": 27
+    },
+    {
+      "type": "row",
+      "title": "EC2 / Auto Scaling",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 42,
+        "w": 24,
+        "h": 1
+      },
+      "id": 28
+    },
+    {
+      "type": "stat",
+      "title": "VM đang chạy (InService)",
+      "description": "TĐ 3.1.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_AutoScalingGroupName) (aws_autoscaling_group_in_service_instances_average{dimension_AutoScalingGroupName=~\"$asg\"})",
+          "legendFormat": "{{dimension_AutoScalingGroupName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 43,
+        "w": 5,
+        "h": 6
+      },
+      "id": 29
+    },
+    {
+      "type": "stat",
+      "title": "Desired / Max",
+      "description": "TĐ 3.1 · api-elb 38–50, oauth 22–25, trần 60–70.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_AutoScalingGroupName) (aws_autoscaling_group_desired_capacity_average{dimension_AutoScalingGroupName=~\"$asg\"})",
+          "legendFormat": "{{dimension_AutoScalingGroupName}} desired",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_AutoScalingGroupName) (aws_autoscaling_group_max_size_average{dimension_AutoScalingGroupName=~\"$asg\"})",
+          "legendFormat": "{{dimension_AutoScalingGroupName}} max",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 5,
+        "y": 43,
+        "w": 5,
+        "h": 6
+      },
+      "id": 30
+    },
+    {
+      "type": "stat",
+      "title": "VM đang khởi tạo",
+      "description": "GroupPendingInstances.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_AutoScalingGroupName) (aws_autoscaling_group_pending_instances_average{dimension_AutoScalingGroupName=~\"$asg\"})",
+          "legendFormat": "{{dimension_AutoScalingGroupName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "0",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 10,
+        "y": 43,
+        "w": 4,
+        "h": 6
+      },
+      "id": 31
+    },
+    {
+      "type": "stat",
+      "title": "CPU % theo ASG",
+      "description": "TĐ 3.2 · xanh < 70%, đỏ > 85%.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "avg by (asg) (label_replace(aws_ec2_cpuutilization_average{dimension_AutoScalingGroupName=~\"$asg\"}, \"asg\", \"$1\", \"dimension_AutoScalingGroupName\", \"(.+)\")) or avg by (asg) (label_replace(aws_ec2_cpuutilization_average * on (name) group_left (tag_aws_autoscaling_groupName) aws_ec2_info{tag_aws_autoscaling_groupName=~\"$asg\"}, \"asg\", \"$1\", \"tag_aws_autoscaling_groupName\", \"(.+)\"))",
+          "legendFormat": "{{asg}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 43,
+        "w": 4,
+        "h": 6
+      },
+      "id": 32
+    },
+    {
+      "type": "stat",
+      "title": "EBS Queue Length (cao nhất)",
+      "description": "TĐ 3.2 · VolumeQueueLength: < 1 / 1–3 / > 3.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(aws_ebs_volume_queue_length_maximum)",
+          "legendFormat": "Max mọi volume",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 43,
+        "w": 3,
+        "h": 6
+      },
+      "id": 33
+    },
+    {
+      "type": "stat",
+      "title": "Status check lỗi",
+      "description": "aws_ec2_status_check_failed_maximum.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(aws_ec2_status_check_failed_maximum)",
+          "legendFormat": "Instance lỗi",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "0",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 43,
+        "w": 3,
+        "h": 6
+      },
+      "id": 34
+    },
+    {
+      "type": "timeseries",
+      "title": "Số VM theo ASG",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (dimension_AutoScalingGroupName) (aws_autoscaling_group_in_service_instances_average{dimension_AutoScalingGroupName=~\"$asg\"})",
+          "legendFormat": "{{dimension_AutoScalingGroupName}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector(70)",
+          "legendFormat": "Trần 70 VMs",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trần 70 VMs"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 49,
+        "w": 8,
+        "h": 8
+      },
+      "id": 35
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU % theo ASG",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "avg by (asg) (label_replace(aws_ec2_cpuutilization_average{dimension_AutoScalingGroupName=~\"$asg\"}, \"asg\", \"$1\", \"dimension_AutoScalingGroupName\", \"(.+)\")) or avg by (asg) (label_replace(aws_ec2_cpuutilization_average * on (name) group_left (tag_aws_autoscaling_groupName) aws_ec2_info{tag_aws_autoscaling_groupName=~\"$asg\"}, \"asg\", \"$1\", \"tag_aws_autoscaling_groupName\", \"(.+)\"))",
+          "legendFormat": "{{asg}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector(85)",
+          "legendFormat": "Ngưỡng đỏ 85%",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ngưỡng đỏ 85%"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 49,
+        "w": 8,
+        "h": 8
+      },
+      "id": 36
+    },
+    {
+      "type": "timeseries",
+      "title": "Mạng vào / ra theo ASG",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (asg) (label_replace(aws_ec2_network_in_sum{dimension_AutoScalingGroupName=~\"$asg\"}, \"asg\", \"$1\", \"dimension_AutoScalingGroupName\", \"(.+)\")) or sum by (asg) (label_replace(aws_ec2_network_in_sum * on (name) group_left (tag_aws_autoscaling_groupName) aws_ec2_info{tag_aws_autoscaling_groupName=~\"$asg\"}, \"asg\", \"$1\", \"tag_aws_autoscaling_groupName\", \"(.+)\"))",
+          "legendFormat": "{{asg}} in",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (asg) (label_replace(aws_ec2_network_out_sum{dimension_AutoScalingGroupName=~\"$asg\"}, \"asg\", \"$1\", \"dimension_AutoScalingGroupName\", \"(.+)\")) or sum by (asg) (label_replace(aws_ec2_network_out_sum * on (name) group_left (tag_aws_autoscaling_groupName) aws_ec2_info{tag_aws_autoscaling_groupName=~\"$asg\"}, \"asg\", \"$1\", \"tag_aws_autoscaling_groupName\", \"(.+)\"))",
+          "legendFormat": "{{asg}} out",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decbytes",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 49,
+        "w": 8,
+        "h": 8
+      },
+      "id": 37
+    },
+    {
+      "type": "row",
+      "title": "MongoDB Atlas",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 24,
+        "h": 1
+      },
+      "id": 38
+    },
+    {
+      "type": "stat",
+      "title": "Cấu hình (vCPU / RAM)",
+      "description": "Spec 2.1 · hardware_platform_num_logical_cpus, mem_total.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_platform_num_logical_cpus{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}} vCPU",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_system_memory_mem_total_kilobytes{cl_name=~\"$cluster\"}) * 1024",
+          "legendFormat": "{{cl_name}} RAM",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 58,
+        "w": 4,
+        "h": 5
+      },
+      "id": 39
+    },
+    {
+      "type": "stat",
+      "title": "Kết nối % trần",
+      "description": "TĐ 4.1 · current / (current + available). Xanh < 47%, đỏ > 78%.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster\"} / (mongodb_connections_current{cl_name=~\"$cluster\"} + mongodb_connections_available{cl_name=~\"$cluster\"}))",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 47
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 58,
+        "w": 4,
+        "h": 5
+      },
+      "id": 40
+    },
+    {
+      "type": "stat",
+      "title": "Kết nối hiện tại",
+      "description": "TĐ 4.1 · xanh < 15K, đỏ > 25K.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 15000
+              },
+              {
+                "color": "red",
+                "value": 25000
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 58,
+        "w": 4,
+        "h": 5
+      },
+      "id": 41
+    },
+    {
+      "type": "stat",
+      "title": "Write IOPS % trần",
+      "description": "TĐ 4.4 · hardware_disk_metrics_max_write_iops / $max_iops.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster\"}) / $max_iops",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 58,
+        "w": 4,
+        "h": 5
+      },
+      "id": 42
+    },
+    {
+      "type": "stat",
+      "title": "CPU %",
+      "description": "TĐ 4.3 · normalized user + kernel. Xanh < 65%, đỏ > 80%.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_system_cpu_normalized_user_percent{cl_name=~\"$cluster\"} + hardware_system_cpu_normalized_kernel_percent{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 65
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 58,
+        "w": 4,
+        "h": 5
+      },
+      "id": 43
+    },
+    {
+      "type": "stat",
+      "title": "CPU IO Wait %",
+      "description": "TĐ 4.3 · IOWAIT > 15% là Đỏ.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_system_cpu_normalized_io_wait_percent{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 58,
+        "w": 4,
+        "h": 5
+      },
+      "id": 44
+    },
+    {
+      "type": "stat",
+      "title": "Độ trễ ghi (thao tác)",
+      "description": "Spec §5 · opLatencies writes: xanh < 10 ms, đỏ > 30 ms.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster\"}[2m]), 1)) / 1000",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 45
+    },
+    {
+      "type": "stat",
+      "title": "Dirty Cache %",
+      "description": "TĐ 4.5 · dirty / maximum configured: xanh < 15%, đỏ > 20%.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * max by (cl_name) (mongodb_wiredTiger_cache_tracked_dirty_bytes_in_the_cache{cl_name=~\"$cluster\"} / mongodb_wiredTiger_cache_maximum_bytes_configured{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 15
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 46
+    },
+    {
+      "type": "stat",
+      "title": "Writers Queue",
+      "description": "TĐ 4.6 · 0 / 1–10 / > 10.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (mongodb_globalLock_currentQueue_writers{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 11
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 47
+    },
+    {
+      "type": "stat",
+      "title": "Vé ghi còn lại",
+      "description": "TĐ 4.6 · queues.execution.write.available: xanh ≥ 96, đỏ < 32.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "min by (cl_name) (mongodb_queues_execution_write_available{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 32
+              },
+              {
+                "color": "green",
+                "value": 96
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 48
+    },
+    {
+      "type": "stat",
+      "title": "COLLSCAN",
+      "description": "TĐ 4.7 · scannedObjects / document_returned: xanh ≤ 5, đỏ > 20.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (rate(mongodb_metrics_queryExecutor_scannedObjects{cl_name=~\"$cluster\"}[2m]) / clamp_min(rate(mongodb_metrics_document_returned{cl_name=~\"$cluster\"}[2m]), 1))",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 49
+    },
+    {
+      "type": "stat",
+      "title": "Độ trễ đồng bộ",
+      "description": "TĐ 4.8 · Chênh lastWriteDate giữa node mới nhất và cũ nhất trong cụm. Xanh < 2 s, đỏ > 10 s.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "(max by (cl_name) (mongodb_repl_lastWrite_lastWriteDate{cl_name=~\"$cluster\"}) - min by (cl_name) (mongodb_repl_lastWrite_lastWriteDate{cl_name=~\"$cluster\"})) / 1000",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 2
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 50
+    },
+    {
+      "type": "stat",
+      "title": "RAM %",
+      "description": "Spec §5 · xanh < 75%, đỏ > 85%.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_system_memory_mem_percent_used{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 51
+    },
+    {
+      "type": "stat",
+      "title": "Ổ cứng %",
+      "description": "Spec §5 · xanh < 70%, đỏ > 85%.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_disk_metrics_space_used_percentage{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 63,
+        "w": 3,
+        "h": 5
+      },
+      "id": 52
+    },
+    {
+      "type": "stat",
+      "title": "Kết nối mới / phút",
+      "description": "TĐ 4.2 · rate(totalCreated) × 60: xanh < 2.000, đỏ > 5.000.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "60 * max by (cl_name) (rate(mongodb_connections_totalCreated{cl_name=~\"$cluster\"}[2m]))",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 2000
+              },
+              {
+                "color": "red",
+                "value": 5000
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 68,
+        "w": 6,
+        "h": 4
+      },
+      "id": 53
+    },
+    {
+      "type": "stat",
+      "title": "Độ trễ ghi đĩa",
+      "description": "hardware_disk_metrics_write_latency_milliseconds.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_disk_metrics_write_latency_milliseconds{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 68,
+        "w": 6,
+        "h": 4
+      },
+      "id": 54
+    },
+    {
+      "type": "stat",
+      "title": "Độ trễ đọc (thao tác)",
+      "description": "opLatencies reads.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (rate(mongodb_opLatencies_reads_latency{cl_name=~\"$cluster\"}[2m]) / clamp_min(rate(mongodb_opLatencies_reads_ops{cl_name=~\"$cluster\"}[2m]), 1)) / 1000",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 68,
+        "w": 6,
+        "h": 4
+      },
+      "id": 55
+    },
+    {
+      "type": "stat",
+      "title": "Read IOPS",
+      "description": "hardware_disk_metrics_max_read_iops.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (hardware_disk_metrics_max_read_iops{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "—",
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 20
+        }
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 68,
+        "w": 6,
+        "h": 4
+      },
+      "id": 56
+    },
+    {
+      "type": "timeseries",
+      "title": "Kết nối theo cụm (đường trần = current + available)",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster\"})",
+          "legendFormat": "{{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max by (cl_name) (mongodb_connections_current{cl_name=~\"$cluster\"} + mongodb_connections_available{cl_name=~\"$cluster\"})",
+          "legendFormat": "Trần {{cl_name}}",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector(25000)",
+          "legendFormat": "Ngưỡng Đỏ 25K",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Trần .*"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ngưỡng Đỏ 25K"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    4,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 72,
+        "w": 8,
+        "h": 9
+      },
+      "id": 57
+    },
+    {
+      "type": "timeseries",
+      "title": "Write IOPS & độ trễ ghi (cụm thi)",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(max by (cl_name) (hardware_disk_metrics_max_write_iops{cl_name=~\"$cluster_exam\"}))",
+          "legendFormat": "Write IOPS",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "vector($max_iops)",
+          "legendFormat": "Trần IOPS",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "max(max by (cl_name) (rate(mongodb_opLatencies_writes_latency{cl_name=~\"$cluster_exam\"}[2m]) / clamp_min(rate(mongodb_opLatencies_writes_ops{cl_name=~\"$cluster_exam\"}[2m]), 1)) / 1000)",
+          "legendFormat": "Độ trễ ghi",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trần IOPS"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Độ trễ ghi"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "ms"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 72,
+        "w": 8,
+        "h": 9
+      },
+      "id": 58
+    },
+    {
+      "type": "timeseries",
+      "title": "Thao tác / giây (cụm thi)",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(mongodb_opcounters_insert{cl_name=~\"$cluster_exam\"}[2m]))",
+          "legendFormat": "insert",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(mongodb_opcounters_update{cl_name=~\"$cluster_exam\"}[2m]))",
+          "legendFormat": "update",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(mongodb_opcounters_query{cl_name=~\"$cluster_exam\"}[2m]))",
+          "legendFormat": "query",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(mongodb_opcounters_getmore{cl_name=~\"$cluster_exam\"}[2m]))",
+          "legendFormat": "getmore",
+          "range": true,
+          "instant": false,
+          "hide": false
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(mongodb_opcounters_command{cl_name=~\"$cluster_exam\"}[2m]))",
+          "legendFormat": "command",
+          "range": true,
+          "instant": false,
+          "hide": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisSoftMin": 0,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 72,
+        "w": 8,
+        "h": 9
+      },
+      "id": 59
+    }
+  ]
+}

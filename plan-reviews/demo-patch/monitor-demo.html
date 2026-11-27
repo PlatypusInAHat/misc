@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Thuyết trình — monitor.edmicro.io | Giám sát & Điều hành Thi số 60K</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-base: #0b1120;
+      --bg-surface: #111827;
+      --bg-card: #1e293b;
+      --bg-card-alt: #0f172a;
+      --border: #334155;
+      --border-strong: #475569;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --sky: #38bdf8;
+      --sky-bg: rgba(56, 189, 248, 0.14);
+      --green: #10b981;
+      --green-bg: rgba(16, 185, 129, 0.14);
+      --amber: #f59e0b;
+      --amber-bg: rgba(245, 158, 11, 0.14);
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.15);
+      --purple: #a78bfa;
+      --purple-bg: rgba(167, 139, 250, 0.14);
+      --radius: 10px;
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    code, pre, .mono {
+      font-family: var(--font-mono);
+    }
+
+    /* Header & Top Sim Bar */
+    .topbar {
+      background: linear-gradient(135deg, #0f172a 0%, #172554 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+    }
+
+    .topbar-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #082f49;
+      flex: none;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .demo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--amber-bg);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .sim-strip {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+    }
+
+    .sim-strip-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      justify-content: space-between;
+    }
+
+    .sim-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sim-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    select, input[type="search"], button {
+      font: inherit;
+      color: inherit;
+    }
+
+    .ctrl-select, .ctrl-input {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      padding: 6px 10px;
+      color: var(--text-main);
+      font-size: 13px;
+    }
+
+    .ctrl-select:focus-visible, .ctrl-input:focus-visible, button:focus-visible {
+      outline: 2px solid var(--sky);
+      outline-offset: 2px;
+    }
+
+    .scale-btn-group {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .scale-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .scale-pill[aria-pressed="true"] {
+      background: var(--sky-bg);
+      border-color: var(--sky);
+      color: var(--sky);
+    }
+
+    /* Main Layout */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px 20px 48px;
+    }
+
+    /* Accessible Tabs (modern-web-guidance compliant) */
+    [role="tablist"] {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
+      padding-bottom: 0;
+      scrollbar-width: thin;
+    }
+
+    [role="tab"] {
+      position: relative;
+      flex: none;
+      white-space: nowrap;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px 8px 0 0;
+      padding: 10px 16px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    [role="tab"]:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* WCAG 1.4.1: Shape (underline via border-block-end on ::after), not color alone */
+    [role="tab"][aria-selected="true"] {
+      color: var(--sky);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    [role="tab"][aria-selected="true"]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 10px;
+      inset-block-end: 0;
+      border-block-end: 3px solid currentColor;
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* hidden="until-found" panel safety: no padding/margins/bg on panel itself */
+    .panel-inner {
+      display: grid;
+      gap: 16px;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Traffic light banner */
+    .status-banner {
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .status-banner.status-green {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(15, 23, 42, 0.95));
+      border-color: rgba(16, 185, 129, 0.55);
+    }
+
+    .status-banner.status-amber {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(15, 23, 42, 0.95));
+      border-color: rgba(245, 158, 11, 0.6);
+    }
+
+    .status-banner.status-red {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(15, 23, 42, 0.95));
+      border-color: rgba(239, 68, 68, 0.7);
+    }
+
+    .status-headline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex: none;
+    }
+
+    .dot-green { background: var(--green); box-shadow: 0 0 0 5px var(--green-bg); }
+    .dot-amber { background: var(--amber); box-shadow: 0 0 0 5px var(--amber-bg); }
+    .dot-red   { background: var(--red);   box-shadow: 0 0 0 5px var(--red-bg); }
+
+    /* Badges & Buttons */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .badge-green  { background: var(--green-bg);  color: #6ee7b7; border-color: rgba(16, 185, 129, 0.4); }
+    .badge-amber  { background: var(--amber-bg);  color: #fcd34d; border-color: rgba(245, 158, 11, 0.4); }
+    .badge-red    { background: var(--red-bg);    color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); }
+    .badge-sky    { background: var(--sky-bg);    color: #7dd3fc; border-color: rgba(56, 189, 248, 0.4); }
+    .badge-purple { background: var(--purple-bg); color: #ddd6fe; border-color: rgba(167, 139, 250, 0.4); }
+    .badge-slate  { background: rgba(148, 163, 184, 0.14); color: #cbd5e1; border-color: var(--border); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 7px;
+      border: 1px solid var(--border-strong);
+      background: #1e293b;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #273549;
+      border-color: var(--sky);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #f8fafc;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #0369a1;
+    }
+
+    .btn-amber {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--amber);
+      color: #fde68a;
+    }
+
+    .btn-red {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: var(--red);
+      color: #fecaca;
+    }
+
+    .btn-green {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--green);
+      color: #a7f3d0;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* KPI Box */
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .kpi-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Progress Bars */
+    .meter-wrap {
+      margin-top: 8px;
+    }
+
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .meter-track {
+      height: 11px;
+      border-radius: 999px;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .fill-green { background: linear-gradient(90deg, #059669, #10b981); }
+    .fill-amber { background: linear-gradient(90deg, #d97706, #f59e0b); }
+    .fill-red   { background: linear-gradient(90deg, #dc2626, #ef4444); }
+
+    /* Exam Funnel */
+    .funnel-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .funnel-step {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .funnel-step .num {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 2px 0;
+    }
+
+    /* Checklist 4/4 */
+    .checklist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    /* SVG Charts */
+    .chart-svg {
+      width: 100%;
+      height: 185px;
+      display: block;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    /* Responsive Table (modern-web-guidance compliant) */
+    .table-wrapper {
+      container-type: inline-size;
+      overflow: auto;
+      max-height: 460px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card-alt);
+    }
+
+    .table-wrapper:focus-visible {
+      outline: 2px solid var(--sky);
+      outline-offset: 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    caption {
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 2;
+      background: #172033;
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    tbody td, tbody th {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.65);
+      vertical-align: top;
+    }
+
+    tbody th {
+      position: sticky;
+      inset-inline-start: 0;
+      z-index: 1;
+      background: #131c2e;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    tbody tr:hover td, tbody tr:hover th {
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    @container (width < 600px) {
+      .table-wrapper {
+        max-height: none;
+      }
+      thead {
+        display: none; /* MANDATORY: Hide column header from layout and screen readers. */
+      }
+      tbody tr {
+        display: block;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 8px;
+        padding: 8px;
+        background: var(--bg-card);
+      }
+      tbody th, tbody td {
+        position: static;
+        display: block;
+        border-bottom: 1px dashed rgba(51, 65, 85, 0.55);
+        padding: 6px 4px;
+        background: transparent;
+      }
+      tbody tr td:last-child {
+        border-bottom: none;
+      }
+      tbody td::before {
+        content: attr(data-label) ": ";
+        font-weight: 700;
+        color: var(--text-muted);
+        display: inline-block;
+        margin-right: 6px;
+      }
+    }
+
+    /* Native Dialog (modern-web-guidance compliant) */
+    dialog {
+      margin: auto;
+      max-width: 640px;
+      width: calc(100% - 32px);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    dialog:modal {
+      overscroll-behavior: contain;
+    }
+
+    dialog::backdrop {
+      overflow: hidden;
+      overscroll-behavior: contain;
+      background: rgba(2, 6, 23, 0.74);
+      backdrop-filter: blur(3px);
+    }
+
+    .dialog-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .dialog-body {
+      padding: 16px 20px;
+      display: grid;
+      gap: 12px;
+      max-height: 70vh;
+      overflow: auto;
+    }
+
+    .dialog-foot {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--bg-card-alt);
+    }
+
+    pre.payload-box {
+      margin: 0;
+      padding: 12px;
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #7dd3fc;
+      font-size: 12px;
+      overflow-x: auto;
+    }
+
+    .notice-box {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card-alt);
+      font-size: 13px;
+    }
+
+    .toast-region {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      display: grid;
+      gap: 8px;
+      max-width: 380px;
+    }
+
+    .toast {
+      background: #0f172a;
+      border: 1px solid var(--sky);
+      border-radius: 8px;
+      padding: 10px 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      font-size: 13px;
+    }
+
+    .sop-steps {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .interlock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">EM</div>
+        <div>
+          <h1>monitor.edmicro.io — Trung tâm Giám sát &amp; Điều hành Thi số 60K</h1>
+          <div class="brand-sub">
+            <span class="demo-pill">DEMO THUYẾT TRÌNH OFFLINE (Dữ liệu mô phỏng theo BaoCaoSauThi &amp; Sự cố 29/10)</span>
+            <span>Dual-Audience: <strong>Trực Thi (Non-Tech)</strong> &harr; <strong>DevOps / AWS EventBridge</strong></span>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <span class="badge badge-sky" id="hdr-clock-badge">Khung giờ mẫu: 19:30 (Pha 1 Phát đề)</span>
+        <span class="badge badge-purple" id="hdr-bus-badge">Bus: edmicro-exam-ops-bus</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="sim-strip" aria-label="Bộ mô phỏng kịch bản thuyết trình">
+    <div class="sim-strip-inner">
+      <div class="sim-group">
+        <label class="sim-label" for="scenario-select">Kịch bản mô phỏng:</label>
+        <select id="scenario-select" class="ctrl-select">
+          <option value="normal">0. Bình thường — Trước/Trong thi ổn định</option>
+          <option value="phase1" selected>1. Pha 1 Phát đề (19:30) — 54.000 Online (Tải cao, Xanh)</option>
+          <option value="s1">2. SOP S1 — Nghẽn Write IOPS &amp; WiredTiger Dirty Cache &gt; 20%</option>
+          <option value="s2">3. SOP S2 — Bão Kết nối MongoDB M60 (&gt; 25K Conn &amp; TLS 428ms)</option>
+          <option value="s3">4. SOP S3 — Lây nhiễm từ Cluster1 (Shared Connection Pool / COLLSCAN)</option>
+          <option value="s4">5. SOP S4 — Lambda Burst Throttle (+550/phút &gt; trần +500/p)</option>
+          <option value="s5">6. SOP S5 — Web ASG Kịch trần &amp; Bật Cloudflare Waiting Room</option>
+          <option value="postexam">7. Sau 21:45 — Đủ Safety Gate 5/5 (An toàn Scale Down)</option>
+        </select>
+      </div>
+      <div class="sim-group">
+        <span class="sim-label">Mốc Quy mô đang Warm:</span>
+        <div class="scale-btn-group" role="group" aria-label="Chọn mốc quy mô mục tiêu">
+          <button type="button" class="scale-pill" data-scale="standby" aria-pressed="false">Standby</button>
+          <button type="button" class="scale-pill" data-scale="5k" aria-pressed="false">&lt;5K</button>
+          <button type="button" class="scale-pill" data-scale="10k" aria-pressed="false">&lt;10K</button>
+          <button type="button" class="scale-pill" data-scale="30k" aria-pressed="false">&lt;30K</button>
+          <button type="button" class="scale-pill" data-scale="60k" aria-pressed="true">~60K (M60)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <!-- Accessible Tabs (no aria-controls; initial selected=true & others hidden="until-found") -->
+    <div role="tablist" aria-label="Chế độ hiển thị Dashboard" focusgroup="tablist nomemory">
+      <button type="button" role="tab" id="tab-btn-duty" aria-selected="true" focusgroupstart>
+        1. Chế độ Trực Thi (Non-Tech)
+      </button>
+      <button type="button" role="tab" id="tab-btn-devops" aria-selected="false" tabindex="-1">
+        2. Chế độ DevOps (Technical &amp; Charts)
+      </button>
+      <button type="button" role="tab" id="tab-btn-control" aria-selected="false" tabindex="-1">
+        3. Bảng Điều Khiển (AWS EventBridge)
+      </button>
+      <button type="button" role="tab" id="tab-btn-dict" aria-selected="false" tabindex="-1">
+        4. Từ điển Chỉ số (Thuyết trình)
+      </button>
+    </div>
+
+    <!-- PANEL 1: NON-TECH DUTY -->
+    <section role="tabpanel" aria-labelledby="tab-btn-duty" id="panel-duty">
+      <div class="panel-inner">
+        <div id="duty-banner" class="status-banner status-green">
+          <div>
+            <div class="status-headline">
+              <span id="duty-dot" class="status-dot dot-green" aria-hidden="true"></span>
+              <h2 id="duty-status-title" style="margin:0;font-size:18px;">HỆ THỐNG XANH — PHÒNG THI ĐANG VẬN HÀNH ỔN ĐỊNH</h2>
+            </div>
+            <p id="duty-status-desc" style="margin:6px 0 0 28px;color:#cbd5e1;"></p>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn" id="btn-ack-alert">Xác nhận đã xem (ACK)</button>
+            <button type="button" class="btn" id="btn-mute-alert">Tạm tắt chuông 5p</button>
+            <button type="button" class="btn btn-primary" id="btn-copy-duty">Copy tin nhắn báo DevOps</button>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <!-- Block 1: GA4 Sĩ số & Phễu -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 1: Sĩ số &amp; Phễu vào Phòng thi (GA4)</h3>
+                <div class="card-sub">Theo dõi thí sinh có đang vào thi &amp; nộp bài trôi chảy không</div>
+              </div>
+              <span class="badge badge-sky" id="duty-ga4-badge">1m / 5m / 30m</span>
+            </div>
+            <div class="kpi-value" id="duty-online-1m">54.200 <span style="font-size:14px;font-weight:500;color:var(--text-muted)">thí sinh (1m)</span></div>
+            <div class="kpi-meta" id="duty-online-windows">5m: 55.100 | 30m: 58.400 | Mốc đã warm: ~60K (M60)</div>
+            <div class="funnel-grid" aria-label="Phễu chuyển đổi thi">
+              <div class="funnel-step">
+                <div style="font-size:11px;color:var(--text-muted)">Phòng chờ</div>
+                <div class="num" id="funnel-wait">6.200</div>
+              </div>
+              <div class="funnel-step">
+                <div style="font-size:11px;color:var(--text-muted)">Đang làm bài</div>
+                <div class="num" id="funnel-active" style="color:var(--green)">46.800</div>
+              </div>
+              <div class="funnel-step">
+                <div style="font-size:11px;color:var(--text-muted)">Đã nộp bài</div>
+                <div class="num" id="funnel-submit" style="color:var(--sky)">1.200</div>
+              </div>
+            </div>
+            <div class="kpi-meta" id="funnel-conv" style="margin-top:10px;">Tỉ lệ vào thi &amp; nộp thành công: <strong>99.4%</strong></div>
+          </article>
+
+          <!-- Block 2: Trải nghiệm tốc độ -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 2: Trải nghiệm Tốc độ &amp; Hàng chờ</h3>
+                <div class="card-sub">Thí sinh bấm câu hỏi / nộp bài có mượt không?</div>
+              </div>
+              <span class="badge badge-green" id="duty-ux-badge">Mượt mà</span>
+            </div>
+            <div class="grid-2" style="gap:10px;grid-template-columns:1fr 1fr;">
+              <div class="notice-box">
+                <div style="font-size:11px;color:var(--text-muted)">Độ trễ Web (p95)</div>
+                <div style="font-size:20px;font-weight:800" id="duty-p95">240 ms</div>
+              </div>
+              <div class="notice-box">
+                <div style="font-size:11px;color:var(--text-muted)">Tỉ lệ lỗi màn hình</div>
+                <div style="font-size:20px;font-weight:800" id="duty-err-rate">0.04%</div>
+              </div>
+              <div class="notice-box">
+                <div style="font-size:11px;color:var(--text-muted)">Hàng chờ Cloudflare</div>
+                <div style="font-size:20px;font-weight:800" id="duty-wr-queue">0 người</div>
+              </div>
+              <div class="notice-box">
+                <div style="font-size:11px;color:var(--text-muted)">App tự gửi lại bài (429)</div>
+                <div style="font-size:20px;font-weight:800" id="duty-retry-ok">100% OK</div>
+              </div>
+            </div>
+            <div class="kpi-meta" id="duty-eta-text" style="margin-top:10px;"></div>
+          </article>
+
+          <!-- Block 3: 3 Thanh An toàn % -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 3: Chỉ số An toàn Quy đổi (%)</h3>
+                <div class="card-sub">Quy chuẩn 0–100% — Không cần nhớ thông số phần cứng</div>
+              </div>
+              <span class="badge badge-green" id="duty-gate-badge">Scaling Gate: OK</span>
+            </div>
+
+            <div class="meter-wrap">
+              <div class="meter-head"><span>1. Độ đầy Phòng thi (GA4 vs Mốc Warm)</span><strong id="pct-users-label">90%</strong></div>
+              <div class="meter-track"><div id="pct-users-bar" class="meter-fill fill-amber" style="width:90%"></div></div>
+            </div>
+
+            <div class="meter-wrap">
+              <div class="meter-head"><span>2. Độ đầy Máy chủ Web &amp; Lambda</span><strong id="pct-compute-label">65%</strong></div>
+              <div class="meter-track"><div id="pct-compute-bar" class="meter-fill fill-green" style="width:65%"></div></div>
+            </div>
+
+            <div class="meter-wrap">
+              <div class="meter-head"><span>3. Độ đầy Sức chứa Database (M60)</span><strong id="pct-db-label">48%</strong></div>
+              <div class="meter-track"><div id="pct-db-bar" class="meter-fill fill-green" style="width:48%"></div></div>
+            </div>
+
+            <div class="notice-box" id="duty-gate-note" style="margin-top:12px;"></div>
+          </article>
+        </div>
+
+        <div class="grid-2">
+          <!-- Block 4: Cổng Kiểm tra Sẵn sàng Trước giờ thi -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 4A: Cổng Kiểm tra Sẵn sàng Trước giờ thi (Pre-Exam Gate)</h3>
+                <div class="card-sub">Bắt buộc đạt 4/4 trước giờ phát đề P1 (19:15) &amp; P2 (20:15)</div>
+              </div>
+              <span class="badge badge-green" id="readiness-score-badge">4 / 4 Đạt</span>
+            </div>
+            <ul class="checklist" id="readiness-list"></ul>
+          </article>
+
+          <!-- Block 4B: Hướng dẫn SOP tiếng Việt -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 4B: Hướng dẫn Hành động cho Team Trực Thi (SOP)</h3>
+                <div class="card-sub" id="duty-sop-subtitle">Quyết định chuẩn xác — Không thao tác cảm tính</div>
+              </div>
+              <button type="button" class="btn btn-primary" id="btn-jump-control">Mở Bảng Điều Khiển</button>
+            </div>
+            <div id="duty-sop-card" class="notice-box"></div>
+            <ol id="duty-sop-steps" class="sop-steps"></ol>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 2: DEVOPS TECHNICAL -->
+    <section role="tabpanel" aria-labelledby="tab-btn-devops" id="panel-devops" hidden="until-found">
+      <div class="panel-inner">
+        <div class="grid-4" id="devops-synthetic-kpis"></div>
+
+        <!-- Inline SVG Charts -->
+        <div class="grid-3">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">MongoDB M60 Connections &amp; Dự báo Socket</h3>
+                <div class="card-sub">Đường đỏ nét đứt: Trần cứng M60 = 32.000 | Cảnh báo: 25.000</div>
+              </div>
+              <span class="badge badge-sky" id="chart-conn-badge">--</span>
+            </div>
+            <svg id="svg-conn-chart" class="chart-svg" viewBox="0 0 420 185" role="img" aria-label="Biểu đồ kết nối MongoDB M60"></svg>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">AWS Lambda Concurrent &amp; Scale Velocity</h3>
+                <div class="card-sub">Provisioned = 1.200 | Reserved = 3.000 | Burst Limit = +500/p</div>
+              </div>
+              <span class="badge badge-sky" id="chart-lambda-badge">--</span>
+            </div>
+            <svg id="svg-lambda-chart" class="chart-svg" viewBox="0 0 420 185" role="img" aria-label="Biểu đồ AWS Lambda Concurrent Executions"></svg>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Write IOPS (vs 10K) &amp; Dirty Cache (Gate 15%)</h3>
+                <div class="card-sub">Phát hiện sớm nghẽn ghi trước khi Tickets Available Writers tụt về 0</div>
+              </div>
+              <span class="badge badge-sky" id="chart-iops-badge">--</span>
+            </div>
+            <svg id="svg-iops-chart" class="chart-svg" viewBox="0 0 420 185" role="img" aria-label="Biểu đồ Write IOPS và Dirty Cache"></svg>
+          </article>
+        </div>
+
+        <!-- Responsive Table: Layer 4 MongoDB Atlas -->
+        <article class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Tầng 4 — MongoDB Atlas Deep Telemetry (`cluster-exam`, `Cluster1`, `Cluster0`)</h3>
+              <div class="card-sub">Gồm cả nhóm chỉ số mới cần kéo live trong `fetch_mongodb_metrics.py` (`CACHE_DIRTY`, `TICKETS`, `COLLSCAN`, `Oplog Lag`)</div>
+            </div>
+          </div>
+          <div tabindex="0" role="region" aria-labelledby="cap-db-table" class="table-wrapper">
+            <table>
+              <caption id="cap-db-table">Bảng chỉ số Database theo cụm (cập nhật theo kịch bản mô phỏng)</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Chỉ số Kỹ thuật</th>
+                  <th scope="col">cluster-exam (M60)</th>
+                  <th scope="col">Cluster1 (M60)</th>
+                  <th scope="col">Ngưỡng / Gate</th>
+                  <th scope="col">Trạng thái &amp; Ghi chú kỹ thuật</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-db-metrics"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Responsive Table: Layer 1, 2, 3 Infrastructure & Network -->
+        <article class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Tầng 1, 2 &amp; 3 — Edge, Lambda/SQS, EC2 ASG, NAT Gateway &amp; Redis SSO</h3>
+              <div class="card-sub">Theo dõi nghẽn cổ chai Compute, SNAT port exhaustion (`172.31.*`) và SQS Circuit Breaker</div>
+            </div>
+          </div>
+          <div tabindex="0" role="region" aria-labelledby="cap-infra-table" class="table-wrapper">
+            <table>
+              <caption id="cap-infra-table">Bảng chỉ số Hạ tầng Compute, Hàng đợi và Mạng</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Tầng / Thành phần</th>
+                  <th scope="col">Chỉ số &amp; Giá trị hiện tại</th>
+                  <th scope="col">Giới hạn / Mốc Warm</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col">Phân tích DevOps</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-infra-metrics"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PANEL 3: CONTROL PLANE (AWS EVENTBRIDGE) -->
+    <section role="tabpanel" aria-labelledby="tab-btn-control" id="panel-control" hidden="until-found">
+      <div class="panel-inner">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Phiên Điều hành AWS EventBridge (`edmicro-exam-ops-bus`)</h3>
+              <div class="card-sub">Mọi thao tác hạ tầng đi qua EventBridge Rule &rarr; External Executor (db · lambda · edge), có RBAC, Interlock &amp; Audit Log</div>
+            </div>
+            <div class="btn-row">
+              <label for="rbac-select" style="font-size:12px;color:var(--text-muted);align-self:center;font-weight:700;">Vai trò (RBAC):</label>
+              <select id="rbac-select" class="ctrl-select">
+                <option value="EXAM_DUTY_OPERATOR">EXAM_DUTY_OPERATOR (Trực Thi)</option>
+                <option value="DEVOPS_SRE" selected>DEVOPS_SRE (Toàn quyền kỹ thuật)</option>
+              </select>
+              <label style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-card-alt);border:1px solid var(--border);padding:6px 10px;border-radius:7px;cursor:pointer;font-size:13px;">
+                <input type="checkbox" id="chk-dry-run" checked> Chế độ Dry-Run (Chỉ xem Diff)
+              </label>
+            </div>
+          </div>
+          <div class="interlock-grid" id="interlock-status-grid"></div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Khối 1: Preset Quy mô -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 1 — Preset Quy mô &amp; Giờ thi</h3>
+                <div class="card-sub">Tách thành lệnh con theo từng miền (<code>parent_action_id</code>) (Khớp Ma trận 5 mốc trong <code>BaoCaoSauThi.md</code>)</div>
+              </div>
+              <span class="badge badge-sky">Duty + SRE</span>
+            </div>
+            <div class="btn-row" id="ctrl-preset-buttons"></div>
+          </article>
+
+          <!-- Khối 2: MongoDB Atlas Control -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 2 — Điều khiển MongoDB Atlas (Rule <code>ops.db.control</code>)</h3>
+                <div class="card-sub">CẤM scale tier nóng giữa giờ thi; Scale-Down bắt buộc qua <code>SafetyChecker</code> 5/5</div>
+              </div>
+              <span class="badge badge-purple">SRE Only (Scale)</span>
+            </div>
+            <div class="btn-row" id="ctrl-db-buttons"></div>
+          </article>
+
+          <!-- Khối 3: AWS Lambda Control -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 3 — Điều khiển AWS Lambda (Rule <code>ops.lambda.control</code>)</h3>
+                <div class="card-sub">Quản lý <code>examination-lambda</code>, <code>lambda-oauth</code> và Circuit Breaker <code>event-monitor</code></div>
+              </div>
+              <span class="badge badge-sky">Duty (Circuit Breaker) + SRE</span>
+            </div>
+            <div class="btn-row" id="ctrl-lambda-buttons"></div>
+          </article>
+
+          <!-- Khối 4: EC2 ASG & Edge Waiting Room -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Khối 4 — EC2 ASG &amp; Cloudflare Edge (Rule <code>ops.edge.control</code>)</h3>
+                <div class="card-sub">Interlock khóa tăng EC2 <code>api-elb/oauth</code> nếu DB đang Vàng/Đỏ; cho phép bật Waiting Room</div>
+              </div>
+              <span class="badge badge-sky">Interlock Protected</span>
+            </div>
+            <div class="btn-row" id="ctrl-ec2-buttons"></div>
+          </article>
+        </div>
+
+        <!-- Khối 5: Live EventBridge Audit Log -->
+        <article class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Khối 5 — Nhật ký Thực thi &amp; Lịch sử EventBridge (Audit Log)</h3>
+              <div class="card-sub">Lưu dấu Actor, Role, Payload, Dry-Run/Executed và trạng thái Bus (<code>DLQ = 0</code>)</div>
+            </div>
+            <button type="button" class="btn" id="btn-clear-audit">Xóa log mô phỏng</button>
+          </div>
+          <div tabindex="0" role="region" aria-labelledby="cap-audit-table" class="table-wrapper">
+            <table>
+              <caption id="cap-audit-table">Lịch sử sự kiện gửi tới bus edmicro-exam-ops-bus</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Thời gian</th>
+                  <th scope="col">Người thực hiện (Role)</th>
+                  <th scope="col">DetailType &amp; Action</th>
+                  <th scope="col">Mục tiêu &amp; Thay đổi</th>
+                  <th scope="col">Kết quả</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-audit-log"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PANEL 4: METRICS DICTIONARY -->
+    <section role="tabpanel" aria-labelledby="tab-btn-dict" id="panel-dict" hidden="until-found">
+      <div class="panel-inner">
+        <article class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Từ điển Chỉ số Giải thích Rõ ràng trước khi Triển khai</h3>
+              <div class="card-sub">Đối chiếu song song Tên Kỹ thuật (DevOps) &harr; Tên Trực Thi (Non-Tech), Công thức và Hành động</div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="sim-group">
+              <label for="dict-search" class="sim-label">Tìm chỉ số:</label>
+              <input id="dict-search" type="search" class="ctrl-input" placeholder="Ví dụ: Dirty Cache, Velocity, NAT, Funnel..." style="min-width:260px;">
+            </div>
+            <div class="sim-group">
+              <label for="dict-filter" class="sim-label">Nhóm tầng:</label>
+              <select id="dict-filter" class="ctrl-select">
+                <option value="all">Tất cả chỉ số (Hiện có + Bổ sung mới)</option>
+                <option value="new">Chỉ lọc Chỉ số MỚI BỔ SUNG</option>
+                <option value="L1">Tầng 1: Users, GA4 &amp; Edge</option>
+                <option value="L2">Tầng 2: AWS Lambda &amp; SQS</option>
+                <option value="L3">Tầng 3: EC2 ASG, NAT &amp; Redis SSO</option>
+                <option value="L4">Tầng 4: MongoDB Atlas</option>
+                <option value="L5">Tầng 5: Synthetic KPIs &amp; EventBridge</option>
+              </select>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div tabindex="0" role="region" aria-labelledby="cap-dict-table" class="table-wrapper" style="max-height:600px;">
+            <table>
+              <caption id="cap-dict-table">Danh mục đầy đủ các chỉ số giám sát thi số monitor.edmicro.io</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Tên Kỹ thuật &amp; Tầng</th>
+                  <th scope="col">Tên cho Team Trực Thi (Non-Tech)</th>
+                  <th scope="col">Đo cái gì &amp; Vì sao quan trọng lúc thi</th>
+                  <th scope="col">Ngưỡng Xanh / Vàng / Đỏ</th>
+                  <th scope="col">Quyết định SOP / EventBridge</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-dictionary"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Native Modal Dialog (NO role="dialog" or aria-modal; autofocus on Cancel) -->
+  <dialog id="confirm-dialog" aria-labelledby="confirm-dialog-title" closedby="closerequest">
+    <form method="dialog">
+      <div class="dialog-head">
+        <h2 id="confirm-dialog-title" style="margin:0;font-size:16px;">Xác nhận gửi lệnh AWS EventBridge</h2>
+        <span class="badge badge-sky" id="dlg-mode-badge">LIVE EXECUTION</span>
+      </div>
+      <div class="dialog-body">
+        <div id="dlg-summary" class="notice-box"></div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">SO SÁNH TRƯỚC &rarr; SAU (DIFF)</div>
+          <div id="dlg-diff" class="notice-box mono"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">PAYLOAD GỬI LÊN <code>edmicro-exam-ops-bus</code></div>
+          <pre id="dlg-payload" class="payload-box"></pre>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <button type="submit" value="cancel" class="btn" autofocus>Hủy bỏ (An toàn)</button>
+        <button type="submit" value="confirm" class="btn btn-primary" id="dlg-confirm-btn">Xác nhận gửi EventBridge</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. STATE & PRESETS (Grounded strictly in BaoCaoSauThi, PlanConfigDay2,
+      //    plan-exam.md, TinhHuong.md, SafetyChecker)
+      // =========================================================================
+      const SCALE_CONFIGS = {
+        standby: { label: 'Standby', maxUsers: 2000, dbTier: 'M10/M30', maxConn: 1500, maxIops: 3000, lambdaRes: 200, lambdaProv: 0, apiDesired: 2, oauthDesired: 2, apiCeil: 10 },
+        '5k':    { label: '<5K',     maxUsers: 5000, dbTier: 'M30',     maxConn: 3000, maxIops: 4000, lambdaRes: 500, lambdaProv: 0, apiDesired: 6, oauthDesired: 4, apiCeil: 15 },
+        '10k':   { label: '<10K',    maxUsers: 10000, dbTier: 'M40',    maxConn: 6000, maxIops: 6000, lambdaRes: 1000, lambdaProv: 300, apiDesired: 12, oauthDesired: 8, apiCeil: 25 },
+        '30k':   { label: '<30K',    maxUsers: 30000, dbTier: 'M50',    maxConn: 16000, maxIops: 8000, lambdaRes: 2000, lambdaProv: 600, apiDesired: 25, oauthDesired: 15, apiCeil: 40 },
+        '60k':   { label: '~60K (M60)', maxUsers: 60000, dbTier: 'M60', maxConn: 32000, maxIops: 10000, lambdaRes: 3000, lambdaProv: 1200, apiDesired: 50, oauthDesired: 25, apiCeil: 70 }
+      };
+
+      const SCENARIOS = {
+        normal: {
+          clock: '18:30 (T-45m Pre-Warm)',
+          severity: 'green',
+          bannerTitle: 'HỆ THỐNG XANH — SẴN SÀNG TRƯỚC GIỜ THI',
+          bannerDesc: 'Tải nền ổn định. ASG đang pre-warm, không có tắc nghẽn DB hay Lambda.',
+          users1m: 12400, users5m: 11800, users30m: 9600,
+          wait: 4200, active: 7900, submit: 300, conv: 99.7,
+          p95: 165, errRate: 0.02, wrQueue: 0, wrEtaMin: 0, retryFail: 0, unhealthyHosts: 0,
+          etaText: 'Dự báo chạm trần: > 60 phút (Hoàn toàn an toàn).',
+          lambdaConc: 320, lambdaVel: 90, lambdaThrottles: 0, lambdaP95: 380, lambdaInitMs: 0, lambdaRamPct: 8.2,
+          oauthConc: 110, jwtErrors: 0, eventMonRes: 50, sqsDepth: 0, sqsAge: 0,
+          apiRunning: 38, apiDesired: 38, apiCpu: 28, oauthRunning: 22, oauthDesired: 22, oauthCpu: 24,
+          scaleInSuspended: true, natPortErr: 0, redisCpu: 18, redisEvictions: 0,
+          dbConn: 4200, dbChurn: 310, dbTlsMs: 24, dbCpu: 22, dbIowait: 1.4,
+          writeIops: 1450, readIops: 1900, dirtyPct: 4.2, writerQueue: 0, ticketsWrite: 128,
+          collscanRatio: 2.1, oplogLag: 0.4, rollingUpdate: false, c1Conn: 3100, c1Cpu: 20,
+          after2145: false, cooldownMin: 30,
+          readiness: [
+            { text: '1. MongoDB Atlas M60 (cluster-exam + Cluster1) hoàn tất trước T-4h (3/3 Healthy)', ok: true },
+            { text: '2. Lambda Provisioned Concurrency = 1.200 sẵn sàng cho Pha 1 (19:15–19:45)', ok: true },
+            { text: '3. EC2 ASG Pre-warm (api-elb >= 38, oauth >= 22) + Suspend ScaleIn', ok: true },
+            { text: '4. SQS Backlog = 0 & EventBridge DLQ = 0', ok: true }
+          ],
+          sop: {
+            title: 'Chế độ Theo dõi Tiêu chuẩn',
+            badge: 'Không cần can thiệp',
+            summary: 'Kiểm tra lại lịch mở đề Pha 1 (19:15–19:45) và Pha 2 (20:15–20:45). Không chạy batch job hoặc re-index.',
+            steps: [
+              'Giữ nguyên trạng thái Suspend ScaleIn trên EC2 ASG suốt ca thi.',
+              'Theo dõi Tỉ lệ vào phòng thi trên GA4 khi học sinh bắt đầu đổ vào từ 19:00.',
+              'Không bấm Scale DB Tier khi đã qua mốc 15:00/16:00.'
+            ]
+          },
+          series: {
+            conn:   [2200, 2500, 2800, 3100, 3400, 3700, 3900, 4200],
+            lambda: [120, 150, 180, 210, 240, 270, 300, 320],
+            iops:   [800, 950, 1050, 1120, 1200, 1300, 1380, 1450],
+            dirty:  [2.5, 2.8, 3.1, 3.5, 3.8, 4.0, 4.1, 4.2]
+          }
+        },
+        phase1: {
+          clock: '19:30 (Pha 1 Phát đề ~60K)',
+          severity: 'green',
+          bannerTitle: 'HỆ THỐNG XANH — PHA 1 PHÁT ĐỀ 60K ĐANG ỔN ĐỊNH',
+          bannerDesc: '54.200 thí sinh online đồng thời. Peak Lambda đạt ~2.050 (dưới trần Reserved 3.000), DB M60 dư địa an toàn.',
+          users1m: 54200, users5m: 55100, users30m: 58400,
+          wait: 6200, active: 46800, submit: 1200, conv: 99.4,
+          p95: 245, errRate: 0.04, wrQueue: 0, wrEtaMin: 0, retryFail: 0, unhealthyHosts: 0,
+          etaText: 'Dự báo chạm trần: > 42 phút (Dư địa Socket DB còn 58%).',
+          lambdaConc: 2050, lambdaVel: 340, lambdaThrottles: 0, lambdaP95: 620, lambdaInitMs: 0, lambdaRamPct: 9.5,
+          oauthConc: 310, jwtErrors: 0, eventMonRes: 50, sqsDepth: 120, sqsAge: 2,
+          apiRunning: 50, apiDesired: 50, apiCpu: 58, oauthRunning: 25, oauthDesired: 25, oauthCpu: 46,
+          scaleInSuspended: true, natPortErr: 0, redisCpu: 39, redisEvictions: 0,
+          dbConn: 13400, dbChurn: 1120, dbTlsMs: 36, dbCpu: 48, dbIowait: 3.1,
+          writeIops: 5200, readIops: 4800, dirtyPct: 8.6, writerQueue: 0, ticketsWrite: 124,
+          collscanRatio: 3.2, oplogLag: 0.9, rollingUpdate: false, c1Conn: 9800, c1Cpu: 42,
+          after2145: false, cooldownMin: 30,
+          readiness: [
+            { text: '1. MongoDB Atlas M60 (cluster-exam + Cluster1) hoàn tất trước T-4h (3/3 Healthy)', ok: true },
+            { text: '2. Lambda Provisioned Concurrency = 1.200 đang gánh tải phát đề Pha 1', ok: true },
+            { text: '3. EC2 ASG api-elb đã lên 50 VMs (Pre-warm T-10m chuẩn bị thu bài)', ok: true },
+            { text: '4. SQS Backlog thấp (120 msgs) & EventBridge DLQ = 0', ok: true }
+          ],
+          sop: {
+            title: 'Giám sát Pha 1 Phát đề (19:15–19:45)',
+            badge: 'Hoạt động đúng thiết kế 60K',
+            summary: 'Lưu lượng đang chạm mốc ~55K–60K nhưng nằm gọn trong năng lực M60 (32K conn / 10K IOPS) và Lambda Reserved 3.000.',
+            steps: [
+              'Trực Thi tiếp tục theo dõi GA4 Phễu vào phòng thi để chắc chắn số Đang làm bài tăng đều.',
+              'Giữ nguyên Provisioned 1.200 tới hết khung Pha 1 (19:45) và bật lại trước Pha 2 (20:15).',
+              'Chuẩn bị sẵn sàng nút Circuit Breaker event-monitor nếu Write IOPS vượt 8.000.'
+            ]
+          },
+          series: {
+            conn:   [4800, 6200, 8100, 10200, 11800, 12600, 13100, 13400],
+            lambda: [420, 760, 1180, 1520, 1890, 2050, 1980, 2050],
+            iops:   [1800, 2400, 3200, 4100, 4600, 5000, 5150, 5200],
+            dirty:  [4.1, 5.2, 6.4, 7.1, 7.9, 8.2, 8.5, 8.6]
+          }
+        },
+        s1: {
+          clock: '20:12 (Cao điểm Lưu bài)',
+          severity: 'red',
+          bannerTitle: 'CẢNH BÁO ĐỎ — SOP S1: NGHẼN GHI DATABASE (IOPS & DIRTY CACHE)',
+          bannerDesc: 'Write IOPS đạt 9.150/10.000 (91.5%), WiredTiger Dirty Cache lên 23.4% (>20%). Hàng đợi ghi (Writers Queue) đang dồn 18 luồng.',
+          users1m: 56400, users5m: 56800, users30m: 58900,
+          wait: 3100, active: 51200, submit: 2100, conv: 95.8,
+          p95: 1840, errRate: 1.45, wrQueue: 0, wrEtaMin: 0, retryFail: 0.3, unhealthyHosts: 0,
+          etaText: 'CẢNH BÁO: Dự báo chạm trần Write IOPS 10.000 trong ~4 phút nếu không xả tải ghi!',
+          lambdaConc: 2480, lambdaVel: 290, lambdaThrottles: 4, lambdaP95: 4200, lambdaInitMs: 0, lambdaRamPct: 12.1,
+          oauthConc: 340, jwtErrors: 0, eventMonRes: 50, sqsDepth: 480, sqsAge: 5,
+          apiRunning: 50, apiDesired: 50, apiCpu: 41, oauthRunning: 25, oauthDesired: 25, oauthCpu: 35,
+          scaleInSuspended: true, natPortErr: 0, redisCpu: 44, redisEvictions: 0,
+          dbConn: 18900, dbChurn: 950, dbTlsMs: 49, dbCpu: 76, dbIowait: 24.5,
+          writeIops: 9150, readIops: 5400, dirtyPct: 23.4, writerQueue: 18, ticketsWrite: 19,
+          collscanRatio: 14.2, oplogLag: 3.8, rollingUpdate: false, c1Conn: 11200, c1Cpu: 49,
+          after2145: false, cooldownMin: 30,
+          readiness: [
+            { text: '1. MongoDB M60 Node khỏe nhưng Write IOPS đang đạt 91.5% & Dirty Cache 23.4%', ok: false },
+            { text: '2. Lambda Provisioned = 1.200 (Duration p95 tăng lên 4.2s do chờ DB)', ok: false },
+            { text: '3. EC2 ASG api-elb = 50 (KHÓA tăng thêm VM vì DB đang Đỏ)', ok: true },
+            { text: '4. EventBridge Bus sẵn sàng thực thi Circuit Breaker', ok: true }
+          ],
+          sop: {
+            title: 'KÍCH HOẠT SOP S1 — CẮT TẢI PHỤ BẢO VỆ LUỒNG GHI BÀI THI',
+            badge: 'Khóa tăng EC2 | Cắt event-monitor',
+            summary: 'Nguyên nhân đến từ nghẽn ghi ổ đĩa DB, KHÔNG phải thiếu Web Server. Việc tăng thêm EC2 lúc này sẽ làm hệ thống sập nhanh hơn.',
+            steps: [
+              'BƯỚC 1 (Trực Thi/DevOps): Bấm Circuit Breaker hạ event-monitor Reserved = 0 (đẩy log sang SQS, nhường ngay ~25-35% Write IOPS).',
+              'BƯỚC 2 (Interlock tự động): KHÓA CỨNG nút tăng EC2 ASG và nút Scale Tier DB.',
+              'BƯỚC 3 (DevOps): Kiểm tra ngay không có batch job / aggregation chạy ngầm trước 21:45; nếu sau 3 phút Dirty Cache chưa hạ <18%, bật Cloudflare Waiting Room giãn nhịp.'
+            ]
+          },
+          series: {
+            conn:   [13000, 14200, 15100, 16000, 17100, 17800, 18400, 18900],
+            lambda: [1600, 1750, 1920, 2100, 2240, 2360, 2420, 2480],
+            iops:   [5600, 6200, 7100, 7900, 8450, 8820, 9010, 9150],
+            dirty:  [10.2, 12.8, 15.1, 17.5, 19.8, 21.4, 22.6, 23.4]
+          }
+        },
+        s2: {
+          clock: '19:34 (Sự cố Bão Kết nối)',
+          severity: 'red',
+          bannerTitle: 'CẢNH BÁO ĐỎ — SOP S2: BÃO KẾT NỐI VÀO MONGODB M60 (26.800 / 32.000)',
+          bannerDesc: 'Connection Churn tăng đột biến +6.400/phút, TLS Handshake vọt 428ms (lặp lại kịch bản 29/10). Có dấu hiệu leak connection pool hoặc SNAT port.',
+          users1m: 51000, users5m: 52300, users30m: 54000,
+          wait: 8900, active: 41200, submit: 900, conv: 93.4,
+          p95: 2950, errRate: 3.1, wrQueue: 0, wrEtaMin: 0, retryFail: 1.2, unhealthyHosts: 2,
+          etaText: 'NGUY CẤP: Còn ~6 phút trước khi chạm trần cứng 32.000 connections của M60!',
+          lambdaConc: 2890, lambdaVel: 410, lambdaThrottles: 12, lambdaP95: 6800, lambdaInitMs: 450, lambdaRamPct: 14.8,
+          oauthConc: 480, jwtErrors: 9, eventMonRes: 50, sqsDepth: 950, sqsAge: 11,
+          apiRunning: 50, apiDesired: 50, apiCpu: 79, oauthRunning: 25, oauthDesired: 25, oauthCpu: 68,
+          scaleInSuspended: true, natPortErr: 14, redisCpu: 62, redisEvictions: 0,
+          dbConn: 26800, dbChurn: 6400, dbTlsMs: 428, dbCpu: 86, dbIowait: 11.0,
+          writeIops: 6900, readIops: 6200, dirtyPct: 16.5, writerQueue: 9, ticketsWrite: 48,
+          collscanRatio: 6.8, oplogLag: 2.1, rollingUpdate: false, c1Conn: 14500, c1Cpu: 58,
+          after2145: false, cooldownMin: 30,
+          readiness: [
+            { text: '1. MongoDB M60 Connections = 26.800 (83.8%) & TLS Handshake = 428ms', ok: false },
+            { text: '2. NAT Gateway báo 14 lỗi ErrorPortAllocation (thiếu cổng SNAT / Elastic IP)', ok: false },
+            { text: '3. ALB có 2 UnHealthyHost bị rớt Health Check do timeout kết nối DB', ok: false },
+            { text: '4. Interlock đã tự động KHÓA tăng EC2 & KHÓA Scale Tier DB', ok: true }
+          ],
+          sop: {
+            title: 'KÍCH HOẠT SOP S2 — CHẶN BÃO KẾT NỐI & BẢO VỆ PRIMARY M60',
+            badge: 'Khẩn cấp — Không được tăng VM hay Scale DB',
+            summary: 'Bão kết nối khiến TLS handshake ngốn CPU Primary. Phải giảm ngay luồng mở kết nối mới vào Atlas.',
+            steps: [
+              'TUYỆT ĐỐI KHÔNG bấm Scale Tier MongoDB lúc này (sẽ gây mất Primary 24.3s giống sự cố 29/10).',
+              'Bật ngay Cloudflare Waiting Room mức Khẩn cấp để hãm dòng thí sinh đăng nhập mới.',
+              'Hạ event-monitor Reserved = 0 qua EventBridge để cắt toàn bộ socket từ luồng tracking.',
+              'DevOps kiểm tra IP nguồn 172.31.* gây churn (Lambda pool phải giữ maxPoolSize=2, maxIdleTimeMS=30000) và kiểm tra SNAT NAT Gateway.'
+            ]
+          },
+          series: {
+            conn:   [11500, 13800, 16900, 19800, 22400, 24100, 25600, 26800],
+            lambda: [1400, 1700, 2100, 2350, 2580, 2720, 2810, 2890],
+            iops:   [4100, 4800, 5300, 5900, 6300, 6600, 6780, 6900],
+            dirty:  [8.0, 9.5, 11.2, 13.0, 14.4, 15.6, 16.1, 16.5]
+          }
+        },
+        s3: {
+          clock: '20:32 (Pha 2)',
+          severity: 'amber',
+          bannerTitle: 'CẢNH BÁO VÀNG/ĐỎ — SOP S3: LÂY NHIỄM TỪ CLUSTER1 (SHARED POOL / COLLSCAN)',
+          bannerDesc: 'Cluster1 báo CPU 89% & COLLSCAN Ratio 38:1 làm kẹt shared connection pool trên Lambda, kéo Duration p95 của cluster-exam lên theo.',
+          users1m: 48500, users5m: 49200, users30m: 52000,
+          wait: 4100, active: 43200, submit: 1200, conv: 96.9,
+          p95: 1320, errRate: 0.72, wrQueue: 0, wrEtaMin: 0, retryFail: 0.1, unhealthyHosts: 0,
+          etaText: 'Dự báo: Nếu không cắt tác vụ Cluster1, cluster-exam sẽ bị nghẽn pool sau ~11 phút.',
+          lambdaConc: 2620, lambdaVel: 210, lambdaThrottles: 3, lambdaP95: 3450, lambdaInitMs: 0, lambdaRamPct: 11.4,
+          oauthConc: 410, jwtErrors: 2, eventMonRes: 50, sqsDepth: 310, sqsAge: 4,
+          apiRunning: 50, apiDesired: 50, apiCpu: 49, oauthRunning: 25, oauthDesired: 25, oauthCpu: 44,
+          scaleInSuspended: true, natPortErr: 0, redisCpu: 55, redisEvictions: 0,
+          dbConn: 16200, dbChurn: 840, dbTlsMs: 62, dbCpu: 58, dbIowait: 5.5,
+          writeIops: 5400, readIops: 6100, dirtyPct: 11.8, writerQueue: 2, ticketsWrite: 98,
+          collscanRatio: 38.4, oplogLag: 1.6, rollingUpdate: false, c1Conn: 24900, c1Cpu: 89,
+          after2145: false, cooldownMin: 30,
+          readiness: [
+            { text: '1. cluster-exam khỏe (CPU 58%) NHƯNG Cluster1 quá tải (CPU 89%, 24.9K Conn)', ok: false },
+            { text: '2. COLLSCAN Ratio đạt 38.4:1 — Có truy vấn quét toàn bảng trên Cluster1', ok: false },
+            { text: '3. Lambda p95 tăng lên 3.45s vì thread bị giữ chờ Cluster1 trả kết quả', ok: false },
+            { text: '4. EventBridge sẵn sàng cô lập event-monitor & tính năng không trọng yếu', ok: true }
+          ],
+          sop: {
+            title: 'KÍCH HOẠT SOP S3 — CÔ LẬP CLUSTER1, BẢO VỆ LUỒNG THI CHÍNH',
+            badge: 'Cách ly cụm phụ | Không thêm EC2',
+            summary: 'cluster-exam bản chất vẫn còn dư sức nhưng bị vạ lây qua Lambda shared pool khi Cluster1 dính COLLSCAN.',
+            steps: [
+              'Hạ ngay event-monitor Reserved = 0 để ngắt luồng ghi thống kê/học liệu sang Cluster1.',
+              'DevOps kiểm tra Slow Query / CurrentOp trên Cluster1 để xác định collection thiếu index hoặc job ngoài luồng.',
+              'Giữ nguyên cấu hình server cluster-exam, không scale down hay thêm VM.'
+            ]
+          },
+          series: {
+            conn:   [11000, 12100, 13400, 14500, 15100, 15600, 16000, 16200],
+            lambda: [1700, 1880, 2050, 2260, 2410, 2500, 2570, 2620],
+            iops:   [3900, 4200, 4600, 4900, 5100, 5250, 5340, 5400],
+            dirty:  [7.2, 8.1, 9.4, 10.2, 10.9, 11.3, 11.6, 11.8]
+          }
+        },
+        s4: {
+          clock: '19:31 (Burst Mở đề)',
+          severity: 'red',
+          bannerTitle: 'CẢNH BÁO ĐỎ — SOP S4: LAMBDA BURST THROTTLE (+560/PHÚT VƯỢT TRẦN +500/P)',
+          bannerDesc: 'DB vẫn rất Xanh (44% Conn, 46% IOPS) nhưng thí sinh mở đề dồn cục vượt tốc độ khởi tạo Lambda +500/phút khiến AWS trả 429 Throttles = 68/phút.',
+          users1m: 57900, users5m: 53000, users30m: 44000,
+          wait: 9400, active: 47800, submit: 700, conv: 95.1,
+          p95: 920, errRate: 2.35, wrQueue: 0, wrEtaMin: 0, retryFail: 0.4, unhealthyHosts: 0,
+          etaText: 'Chú ý: Không nghẽn DB; đang nghẽn tốc độ nở concurrency của AWS Lambda (+560/p > +500/p).',
+          lambdaConc: 2240, lambdaVel: 560, lambdaThrottles: 68, lambdaP95: 780, lambdaInitMs: 1450, lambdaRamPct: 10.1,
+          oauthConc: 495, jwtErrors: 4, eventMonRes: 50, sqsDepth: 190, sqsAge: 3,
+          apiRunning: 50, apiDesired: 50, apiCpu: 56, oauthRunning: 25, oauthDesired: 25, oauthCpu: 62,
+          scaleInSuspended: true, natPortErr: 0, redisCpu: 48, redisEvictions: 0,
+          dbConn: 14100, dbChurn: 1650, dbTlsMs: 39, dbCpu: 45, dbIowait: 2.8,
+          writeIops: 4600, readIops: 5100, dirtyPct: 8.1, writerQueue: 0, ticketsWrite: 128,
+          collscanRatio: 2.9, oplogLag: 0.6, rollingUpdate: false, c1Conn: 9200, c1Cpu: 41,
+          after2145: false, cooldownMin: 30,
+          readiness: [
+            { text: '1. MongoDB M60 hoàn toàn Xanh (CPU 45%, Conn 14.1K, Write IOPS 4.6K)', ok: true },
+            { text: '2. AWS Lambda Scale Velocity = +560/p (> +500/p) & 68 Throttles/p', ok: false },
+            { text: '3. OAuth Lambda gần chạm trần Reserved 500 (495/500)', ok: false },
+            { text: '4. Scaling Gate cho phép tăng Provisioned / Bật Waiting Room làm phẳng đỉnh', ok: true }
+          ],
+          sop: {
+            title: 'KÍCH HOẠT SOP S4 — XỬ LÝ LAMBDA THROTTLE & LÀM PHẲNG ĐỈNH MỞ ĐỀ',
+            badge: 'DB Xanh — Xử lý tại tầng Lambda & Edge',
+            summary: 'Lỗi 429 đến từ giới hạn tốc độ scale (+500/phút) hoặc trần Reserved của Lambda, không phải do DB.',
+            steps: [
+              'Kiểm tra & nâng ngay Provisioned Concurrency cho examination-lambda (1.200 -> 1.800) hoặc nâng OAuth Reserved (500 -> 800) qua EventBridge.',
+              'Hạ event-monitor Reserved = 0 tạm thời để giải phóng Account Concurrency Quota.',
+              'Bật Cloudflare Waiting Room chế độ làm phẳng (500 người/phút) trong 3 phút để tránh burst vượt +500/phút.'
+            ]
+          },
+          series: {
+            conn:   [6200, 7400, 8900, 10400, 11800, 12900, 13600, 14100],
+            lambda: [600, 780, 990, 1250, 1520, 1980, 2180, 2240],
+            iops:   [2100, 2500, 2900, 3400, 3900, 4200, 4450, 4600],
+            dirty:  [4.5, 5.1, 5.8, 6.4, 7.0, 7.5, 7.9, 8.1]
+          }
+        },
+        s5: {
+          clock: '20:42 (Nước rút Nộp bài)',
+          severity: 'amber',
+          bannerTitle: 'CẢNH BÁO VÀNG — SOP S5: WEB ASG CHẠM TRẦN 50 VMs & MỞ WAITING ROOM',
+          bannerDesc: 'DB M60 vẫn Xanh (CPU 51%, IOPS 54%), nhưng EC2 api-elb đã 50/50 VMs CPU 88% và Gateway p95 lên 940ms.',
+          users1m: 61200, users5m: 60400, users30m: 59100,
+          wait: 4800, active: 52100, submit: 4300, conv: 98.1,
+          p95: 940, errRate: 0.42, wrQueue: 1200, wrEtaMin: 1.5, retryFail: 0, unhealthyHosts: 0,
+          etaText: 'DB còn khỏe — Scaling Gate ĐANG MỞ (OK) cho phép mở trần EC2 api-elb lên 60–70 VMs!',
+          lambdaConc: 2150, lambdaVel: 240, lambdaThrottles: 0, lambdaP95: 690, lambdaInitMs: 0, lambdaRamPct: 9.8,
+          oauthConc: 280, jwtErrors: 0, eventMonRes: 50, sqsDepth: 150, sqsAge: 2,
+          apiRunning: 50, apiDesired: 50, apiCpu: 88, oauthRunning: 25, oauthDesired: 25, oauthCpu: 72,
+          scaleInSuspended: true, natPortErr: 0, redisCpu: 52, redisEvictions: 0,
+          dbConn: 15800, dbChurn: 980, dbTlsMs: 41, dbCpu: 51, dbIowait: 3.9,
+          writeIops: 5400, readIops: 5200, dirtyPct: 9.8, writerQueue: 0, ticketsWrite: 125,
+          collscanRatio: 3.4, oplogLag: 0.8, rollingUpdate: false, c1Conn: 10100, c1Cpu: 46,
+          after2145: false, cooldownMin: 30,
+          readiness: [
+            { text: '1. MongoDB M60 Xanh (CPU 51%, Conn 15.8K, Write IOPS 5.4K) — Scaling Gate = OK', ok: true },
+            { text: '2. EC2 api-elb đang chạy 50/50 trần (CPU 88%), cần mở trần lên 60–70', ok: false },
+            { text: '3. Cloudflare Waiting Room đang giữ 1.200 người (~1.5p đợi) để bảo vệ Origin', ok: true },
+            { text: '4. Tỉ lệ Client 429 Retry thành công 100% (không mất bài làm)', ok: true }
+          ],
+          sop: {
+            title: 'KÍCH HOẠT SOP S5 — MỞ TRẦN EC2 ASG (50 -> 60/70) & ĐIỀU TIẾT EDGE',
+            badge: 'Scaling Gate = OK (Được phép tăng Web VM)',
+            summary: 'Lượng thí sinh vượt mốc 60K (61.200). Do DB vẫn Xanh, đây là trường hợp DUY NHẤT được phép tăng thêm EC2 Web Server.',
+            steps: [
+              'Bấm nút mở trần EC2 api-elb Desired = 60 (Max = 70) trên Bảng Điều Khiển EventBridge.',
+              'Giữ Cloudflare Waiting Room điều tiết nhẹ (~1.5 phút chờ) trong lúc đợi EC2 mới lên trạng thái InService.',
+              'Sau khi p95 hạ < 400ms và CPU < 70%, chuyển Waiting Room về Bypass.'
+            ]
+          },
+          series: {
+            conn:   [11200, 12400, 13600, 14300, 14900, 15400, 15600, 15800],
+            lambda: [1520, 1680, 1840, 1920, 2010, 2090, 2120, 2150],
+            iops:   [3800, 4100, 4500, 4800, 5050, 5200, 5320, 5400],
+            dirty:  [6.1, 7.0, 7.8, 8.4, 8.9, 9.3, 9.6, 9.8]
+          }
+        },
+        postexam: {
+          clock: '21:52 (Sau giờ thi — An toàn Scale Down)',
+          severity: 'green',
+          bannerTitle: 'HỆ THỐNG XANH — ĐỦ 5/5 ĐIỀU KIỆN SAFETY GATE HẠ TẢI SAU 21:45',
+          bannerDesc: 'Ca thi đã kết thúc hoàn toàn. Dirty Cache = 3.1% (< 15%), Cooldown >= 15p, SQS Backlog = 0. Được phép hạ tải tiết kiệm chi phí.',
+          users1m: 1850, users5m: 2400, users30m: 9800,
+          wait: 40, active: 120, submit: 1690, conv: 99.9,
+          p95: 120, errRate: 0.01, wrQueue: 0, wrEtaMin: 0, retryFail: 0, unhealthyHosts: 0,
+          etaText: 'Safety Gate Scale-Down: ĐỦ 5/5 ĐIỀU KIỆN — An toàn chạy Batch Job & Hạ cấu hình Standby.',
+          lambdaConc: 65, lambdaVel: 15, lambdaThrottles: 0, lambdaP95: 210, lambdaInitMs: 0, lambdaRamPct: 7.4,
+          oauthConc: 18, jwtErrors: 0, eventMonRes: 50, sqsDepth: 0, sqsAge: 0,
+          apiRunning: 38, apiDesired: 38, apiCpu: 11, oauthRunning: 22, oauthDesired: 22, oauthCpu: 9,
+          scaleInSuspended: true, natPortErr: 0, redisCpu: 12, redisEvictions: 0,
+          dbConn: 1950, dbChurn: 80, dbTlsMs: 19, dbCpu: 9, dbIowait: 0.5,
+          writeIops: 380, readIops: 520, dirtyPct: 3.1, writerQueue: 0, ticketsWrite: 128,
+          collscanRatio: 1.5, oplogLag: 0.2, rollingUpdate: false, c1Conn: 1400, c1Cpu: 8,
+          after2145: true, cooldownMin: 22,
+          readiness: [
+            { text: '1. Thời gian hiện tại 21:52 (Đã qua ngưỡng cấm 21:45)', ok: true },
+            { text: '2. Trạng thái DB IDLE (CPU 9%, Connections 1.950)', ok: true },
+            { text: '3. WiredTiger Dirty Cache = 3.1% (Đạt ngưỡng an toàn < 15%)', ok: true },
+            { text: '4. Cooldown 22 phút (>= 15p) & SQS event-monitor = 0', ok: true }
+          ],
+          sop: {
+            title: 'QUY TRÌNH HẠ TẢI & CHẠY BATCH JOB SAU 21:45',
+            badge: 'Safety Gate 5/5 ĐẠT',
+            summary: 'Có thể hạ Provisioned Lambda về 0, bật lại ScaleIn ASG về mốc Standby và chạy các batch job tổng hợp điểm.',
+            steps: [
+              'Chuyển Preset về "Standby Sau 21:45" trên Bảng Điều Khiển EventBridge (tắt Provisioned 1.200, mở ScaleIn ASG).',
+              'Nếu từng tắt event-monitor, xả SQS từ từ ở mức Reserved 50.',
+              'SRE kiểm tra và lên lịch hạ MongoDB Atlas Tier về Standby nếu ngày kế tiếp không có ca thi lớn.'
+            ]
+          },
+          series: {
+            conn:   [14200, 11800, 8900, 6200, 4100, 2900, 2300, 1950],
+            lambda: [1850, 1420, 960, 540, 280, 140, 90, 65],
+            iops:   [4800, 3900, 2800, 1900, 1200, 740, 510, 380],
+            dirty:  [8.8, 7.6, 6.4, 5.2, 4.4, 3.8, 3.4, 3.1]
+          }
+        }
+      };
+
+      const DICTIONARY_ITEMS = [
+        { layer: 'L1', isNew: false, tech: 'GA4 activeUsers (1m/5m/30m)', duty: 'Sĩ số thí sinh đang Online', desc: 'Đếm số người dùng thực đang mở ứng dụng thi theo 3 cửa sổ thời gian để đối chiếu cung-cầu theo mốc <5K/<10K/<30K/~60K.', thresh: '<70% / 70-90% / >90% mốc warm', action: 'Vượt mốc đã warm -> báo DevOps mở trần ASG.' },
+        { layer: 'L1', isNew: true,  tech: 'Exam Funnel Conversion %', duty: 'Tỉ lệ vào phòng & Nộp bài thành công', desc: 'Theo dõi 3 bước Phòng chờ -> Đang thi -> Đã nộp. Phát hiện kẹt ngay ở bước đăng nhập hay bấm nộp bài dù server chưa sập.', thresh: '>=98% / 95-97.9% / <95%', action: 'Phòng chờ phình to -> kiểm tra OAuth / Cloudflare Waiting Room.' },
+        { layer: 'L1', isNew: true,  tech: 'Cloudflare Waiting Room (Queue & Wait)', duty: 'Hàng chờ vào phòng thi', desc: 'Số thí sinh đang xếp hàng tại Edge và thời gian chờ ước tính. Là van xả áp bảo vệ Origin khi Web hoặc DB chạm ngưỡng.', thresh: '0 / 1-500 (<2p) / >500 (>2p)', action: 'SOP S5 / S2: Điều tiết nhịp vào thi qua EventBridge.' },
+        { layer: 'L1', isNew: true,  tech: 'Client 429 Retry Success/Fail Rate', duty: 'Tỉ lệ App tự gửi lại đáp án thành công', desc: 'Đo phần trăm request bị 429 sau đó client tự backoff gửi lại thành công. Nếu Fail > 0 nghĩa là có nguy cơ mất bài làm thí sinh.', thresh: 'Fail 0% / 0.1-0.5% / >0.5%', action: 'Fail > 0 -> cắt ngay event-monitor & làm phẳng lưu lượng Edge.' },
+        { layer: 'L1', isNew: true,  tech: 'ALB UnHealthyHostCount', duty: 'Số máy chủ Web bị văng khỏi cân bằng tải', desc: 'Phát hiện VM dù còn trong ASG Desired nhưng đã rớt Health Check không phục vụ được traffic thật.', thresh: '0 / 1 / >=2', action: 'Cấm ScaleIn; thay thế VM lỗi.' },
+
+        { layer: 'L2', isNew: false, tech: 'Lambda Concurrent vs Reserved (3.000) / Provisioned (1.200)', duty: 'Độ đầy luồng xử lý bài thi (Lambda)', desc: 'Số phiên Lambda chạy song song của examination-lambda (3.000 Reserved, 1.200 Provisioned) và lambda-oauth (500 Reserved).', thresh: '<75% / 75-90% / >90% Reserved', action: 'Giữ Provisioned 1.200 suốt P1 (19:15-19:45) & P2 (20:15-20:45).' },
+        { layer: 'L2', isNew: true,  tech: 'Lambda Scale Velocity (Delta/min vs +500/p)', duty: 'Tốc độ tăng tải so với trần khởi tạo AWS', desc: 'Tốc độ tăng Concurrent mỗi phút. RẤT QUAN TRỌNG: Có thể chưa đầy 3.000 nhưng tăng > +500/phút lúc mở đề vẫn dính 429 Throttle!', thresh: '<350/p / 350-450/p / >450/p', action: 'SOP S4: Nâng Provisioned hoặc bật Waiting Room làm phẳng đỉnh.' },
+        { layer: 'L2', isNew: true,  tech: 'SQS Queue Depth & OldestMessageAge', duty: 'Độ tồn đọng log sự kiện khi ngắt event-monitor', desc: 'Đo độ sâu hàng đợi SQS buffer khi kích hoạt Circuit Breaker (hạ event-monitor Reserved = 0). Giúp chắc chắn không tràn/mất log.', thresh: '<50K (<5p) / 50-200K / >200K', action: 'Xả từ từ Reserved=50 sau 21:45 khi DB Xanh.' },
+        { layer: 'L2', isNew: false, tech: 'Duration p95 / Max (20s) & InitDuration', duty: 'Thời gian xử lý 1 lượt thi & Cold Start', desc: 'Thời gian chạy hàm Lambda (giới hạn Fail-Fast 20s) và thời gian khởi tạo nguội.', thresh: '<1.5s / 1.5-4s / >4s (Max 20s)', action: 'Đối chiếu ngay với DB Latency trước khi sửa Lambda.' },
+
+        { layer: 'L3', isNew: false, tech: 'EC2 ASG InService / Desired (38-50 / Ceiling 70)', duty: 'Số máy chủ Web đang gánh tải', desc: 'Trạng thái VM thực tế và khóa Suspend ScaleIn trong giờ thi.', thresh: 'InService == Desired / lệch 1 / lệch >=2', action: 'Chỉ tăng khi Scaling Gate = OK (DB Xanh).' },
+        { layer: 'L3', isNew: true,  tech: 'NAT Gateway ErrorPortAllocation & PacketsDropCount', duty: 'Cảnh báo nghẽn cổng mạng ra ngoài (SNAT)', desc: 'Phát hiện cạn kiệt 64K cổng SNAT trên IP NAT (172.31.*) từng góp phần gây nghẽn TLS handshake 428ms ngày 29/10.', thresh: '0 / 1-5/p / >5/p', action: 'Thêm Elastic IP cho NAT Gateway / kiểm tra Keep-Alive.' },
+        { layer: 'L3', isNew: true,  tech: 'ElastiCache Redis SSO (CPU, CurrConn, Evictions)', duty: 'Sức khỏe bộ nhớ phiên Đăng nhập (SSO)', desc: 'Nếu Evictions > 0, Redis bị tràn RAM và đuổi session -> thí sinh bị văng đăng nhập hàng loạt.', thresh: 'Evictions=0, CPU<60% / 60-80% / Evictions>0', action: 'Cấm xóa cache; tăng kích thước node Redis ngoài giờ cao điểm.' },
+
+        { layer: 'L4', isNew: false, tech: 'MongoDB CONNECTIONS (vs M60 Max 32.000)', duty: 'Độ đầy đường truyền vào Cơ sở dữ liệu', desc: 'Tổng số connection vào Primary trên M60 (ngưỡng cảnh báo 15K, báo động 25K, trần 32K).', thresh: '<15K / 15-25K / >25K', action: 'SOP S2: Khóa tăng EC2, kiểm tra maxPoolSize=2.' },
+        { layer: 'L4', isNew: true,  tech: 'Connection Churn Rate (Delta/min) & TLS Handshake ms', duty: 'Tốc độ kết nối mới đổ vào DB', desc: 'Bắt sớm bão kết nối (như 181.231 conn / 7p ngày 29/10) và độ trễ TLS trước khi tổng Conn chạm 25K.', thresh: '<2K/p & <50ms / 2-5K/p / >5K/p (TLS >150ms)', action: 'SOP S2: Hãm mở mới bằng Waiting Room & kiểm tra pool.' },
+        { layer: 'L4', isNew: true,  tech: 'WiredTiger Dirty Cache % (CACHE_DIRTY_BYTES / USED)', duty: 'Bộ nhớ đệm ghi DB chưa kịp xả xuống đĩa', desc: 'Cảnh báo sớm nghẽn đĩa trước khi Write IOPS bão hòa 10K. Cũng là Safety Gate bắt buộc (<15%) để được phép Scale Down.', thresh: '<15% / 15-20% / >20%', action: 'SOP S1: Hạ event-monitor = 0; CẤM Scale Down nếu >=15%.' },
+        { layer: 'L4', isNew: true,  tech: 'Tickets Available Writes (Max 128) & Writer Queue', duty: 'Số vé ghi còn lại & Hàng đợi khóa ghi DB', desc: 'Trong fetch_mongodb_metrics.py hiện chỉ có ở Mock Data (cần kéo live API). Vé tụt < 32 nghĩa là DB sắp đứng luồng ghi.', thresh: '>=96 / 32-95 / <32 hoặc Queue>10', action: 'SOP S1: Cắt tải phụ ngay lập tức.' },
+        { layer: 'L4', isNew: true,  tech: 'COLLSCAN Ratio (SCANNED_OBJECTS / RETURNED)', duty: 'Tỉ lệ truy vấn quét toàn bảng (thiếu Index)', desc: 'Phát hiện câu query quét hàng triệu bản ghi (29/10 ghi nhận 211 COLLSCAN / 9M docs) làm vọt CPU Cluster1 và cluster-exam.', thresh: '<=5:1 / 5:1-20:1 / >20:1', action: 'SOP S3: Cô lập cluster-1 / xử lý slow query.' },
+        { layer: 'L4', isNew: true,  tech: 'Oplog Replication Lag & Rolling Update State', duty: 'Độ trễ đồng bộ & Tình trạng bảo trì DB', desc: 'Phát hiện trạng thái "0 of 3 servers complete (updating disk size)" hoặc mất Primary (24.3s schemaLock).', thresh: 'Lag <2s & 3/3 Healthy / 2-10s / >10s hoặc Rolling', action: 'KHÓA CỨNG nút Scale Tier DB; nâng cấp phải xong trước T-4h.' },
+
+        { layer: 'L5', isNew: true,  tech: 'Socket Headroom Forecast & Saturation ETA (phút)', duty: 'Dự báo dư địa Socket & Thời gian chạm trần', desc: 'Tính sẵn (Lambda Concurrent x 2 x 3 nodes) và ngoại suy còn bao nhiêu phút chạm ngưỡng 25K Conn / 10K IOPS.', thresh: '>30 phút / 15-30p / <15 phút', action: 'Giúp Trực Thi hành động trước khi sự cố xảy ra.' },
+        { layer: 'L5', isNew: true,  tech: 'Pre-Exam Readiness Gate (4/4) & Safety Scale-Down Gate (5/5)', duty: 'Cổng Kiểm tra Trước thi & Điều kiện Hạ tải sau 21:45', desc: 'Chuẩn hóa thành đèn Xanh/Đỏ tự động thay vì nhớ bằng trí nhớ con người.', thresh: '4/4 (trước thi) & 5/5 (sau 21:45)', action: 'Khóa/mở tự động các nút điều khiển EventBridge.' },
+        { layer: 'L5', isNew: true,  tech: 'EventBridge Bus Health (DLQ & FailedInvocations)', duty: 'Độ tin cậy Nút bấm Điều khiển', desc: 'Xác nhận lệnh bấm trên monitor.edmicro.io thực sự được AWS EventBridge giao tới đích thành công.', thresh: '0 / 1 / >=2', action: 'Cảnh báo SRE ngay nếu nút điều khiển bị rớt vào DLQ.' }
+      ];
+
+      let currentScenarioKey = 'phase1';
+      let currentScaleKey = '60k';
+      let currentRole = 'DEVOPS_SRE';
+      let pendingAction = null;
+      let auditEntries = [
+        { time: '18:45:00', actor: 'scheduler (SYSTEM_SCHEDULER)', detail: 'preset EXAM_60K / Pre-Warm T-45p (fan-out)', target: 'api-elb: 25->38, oauth: 15->22, Suspend ScaleIn', status: 'EXECUTED' },
+        { time: '19:15:00', actor: 'scheduler (SYSTEM_SCHEDULER)', detail: 'lambda.concurrency.set_provisioned / Provisioned Pha 1', target: 'examination-lambda Provisioned: 0 -> 1200', status: 'EXECUTED' }
+      ];
+
+      // DOM helpers
+      const $ = (id) => document.getElementById(id);
+
+      function showToast(msg, tone = 'sky') {
+        const region = $('toast-region');
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.style.borderColor = tone === 'red' ? 'var(--red)' : tone === 'green' ? 'var(--green)' : tone === 'amber' ? 'var(--amber)' : 'var(--sky)';
+        el.textContent = msg;
+        region.appendChild(el);
+        setTimeout(() => { el.remove(); }, 4200);
+      }
+
+      // =========================================================================
+      // 2. ACCESSIBLE TABS (modern-web-guidance: NO aria-controls, hidden="until-found"
+      //    + beforematch, shape underline via ::after, focusgroup detection fallback)
+      // =========================================================================
+      const tabButtons = Array.from(document.querySelectorAll('[role="tab"]'));
+      const tabPanels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+      function selectTab(index, moveFocus = false) {
+        tabButtons.forEach((btn, i) => {
+          const selected = i === index;
+          btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+          btn.tabIndex = selected ? 0 : -1;
+          if (selected) {
+            tabPanels[i].removeAttribute('hidden');
+          } else {
+            tabPanels[i].setAttribute('hidden', 'until-found');
+          }
+        });
+        if (moveFocus) tabButtons[index].focus();
+      }
+
+      tabButtons.forEach((btn, idx) => {
+        btn.addEventListener('click', () => selectTab(idx, false));
+      });
+
+      // Fallback keyboard roving tabindex when CSS/HTML focusgroup is unsupported
+      const supportsFocusGroup = 'focusGroup' in HTMLElement.prototype;
+      if (!supportsFocusGroup) {
+        const tablist = document.querySelector('[role="tablist"]');
+        tablist.addEventListener('keydown', (e) => {
+          const curIdx = tabButtons.findIndex((b) => b.getAttribute('aria-selected') === 'true');
+          let nextIdx = null;
+          if (e.key === 'ArrowRight') nextIdx = (curIdx + 1) % tabButtons.length;
+          else if (e.key === 'ArrowLeft') nextIdx = (curIdx - 1 + tabButtons.length) % tabButtons.length;
+          else if (e.key === 'Home') nextIdx = 0;
+          else if (e.key === 'End') nextIdx = tabButtons.length - 1;
+          if (nextIdx !== null) {
+            e.preventDefault();
+            selectTab(nextIdx, true);
+          }
+        });
+      }
+
+      // Sync tab when browser Ctrl+F reveals a hidden="until-found" panel
+      tabPanels.forEach((panel, idx) => {
+        panel.addEventListener('beforematch', () => selectTab(idx, false));
+      });
+
+      // =========================================================================
+      // 3. SVG LINE CHART BUILDER (Static Limits + Clean Visuals)
+      // =========================================================================
+      function renderSvgChart(svgId, { points, maxY, limitY, warnY, color, unit, labels, secondPoints, secondColor }) {
+        const svg = $(svgId);
+        const W = 420, H = 185;
+        const pad = { t: 18, r: 14, b: 26, l: 46 };
+        const pw = W - pad.l - pad.r;
+        const ph = H - pad.t - pad.b;
+
+        const yPos = (val) => pad.t + ph - Math.min(1, Math.max(0, val / maxY)) * ph;
+        const xPos = (i) => pad.l + (i / (points.length - 1)) * pw;
+
+        const pathD = points.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xPos(i).toFixed(1)} ${yPos(v).toFixed(1)}`).join(' ');
+        const areaD = `${pathD} L ${xPos(points.length - 1).toFixed(1)} ${(pad.t + ph).toFixed(1)} L ${xPos(0).toFixed(1)} ${(pad.t + ph).toFixed(1)} Z`;
+
+        let secondSvg = '';
+        if (secondPoints) {
+          const sD = secondPoints.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xPos(i).toFixed(1)} ${yPos(v).toFixed(1)}`).join(' ');
+          secondSvg = `<path d="${sD}" fill="none" stroke="${secondColor}" stroke-width="2" stroke-dasharray="4 3" />`;
+        }
+
+        const gridLines = [0, 0.25, 0.5, 0.75, 1].map((r) => {
+          const y = (pad.t + ph - r * ph).toFixed(1);
+          const lbl = Math.round(maxY * r);
+          const txt = lbl >= 1000 ? `${(lbl / 1000).toFixed(lbl % 1000 === 0 ? 0 : 1)}k` : lbl;
+          return `<line x1="${pad.l}" y1="${y}" x2="${W - pad.r}" y2="${y}" stroke="#1e293b" stroke-width="1" />
+                  <text x="${pad.l - 6}" y="${Number(y) + 3}" text-anchor="end" fill="#64748b" font-size="10">${txt}</text>`;
+        }).join('');
+
+        const limitLine = limitY ? `<line x1="${pad.l}" y1="${yPos(limitY).toFixed(1)}" x2="${W - pad.r}" y2="${yPos(limitY).toFixed(1)}" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 4" />
+          <text x="${W - pad.r - 2}" y="${(yPos(limitY) - 4).toFixed(1)}" text-anchor="end" fill="#fca5a5" font-size="10" font-weight="700">Limit ${limitY.toLocaleString('vi-VN')}${unit}</text>` : '';
+
+        const warnLine = warnY ? `<line x1="${pad.l}" y1="${yPos(warnY).toFixed(1)}" x2="${W - pad.r}" y2="${yPos(warnY).toFixed(1)}" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="3 3" />
+          <text x="${pad.l + 4}" y="${(yPos(warnY) - 4).toFixed(1)}" fill="#fcd34d" font-size="10">Ngưỡng ${warnY.toLocaleString('vi-VN')}${unit}</text>` : '';
+
+        const dots = points.map((v, i) => `<circle cx="${xPos(i).toFixed(1)}" cy="${yPos(v).toFixed(1)}" r="${i === points.length - 1 ? 4 : 2.5}" fill="${color}" />`).join('');
+        const xTicks = labels.map((lb, i) => i % 2 === 0 || i === labels.length - 1
+          ? `<text x="${xPos(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" fill="#64748b" font-size="10">${lb}</text>`
+          : '').join('');
+
+        svg.innerHTML = `
+          ${gridLines}
+          ${limitLine}
+          ${warnLine}
+          <path d="${areaD}" fill="${color}" fill-opacity="0.12" />
+          <path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.4" />
+          ${secondSvg}
+          ${dots}
+          ${xTicks}
+        `;
+      }
+
+      // =========================================================================
+      // 4. INTERLOCK ENGINE & RENDERING
+      // =========================================================================
+      function computeSafety(sc, scale) {
+        const dbRedOrAmber = sc.dbCpu >= 75 || sc.writeIops >= 8000 || sc.dbConn >= 25000 || sc.dirtyPct >= 20 || sc.c1Cpu >= 85;
+        const examActive = !sc.after2145;
+        const safetyDownOk = sc.after2145 && sc.dbCpu < 25 && sc.dirtyPct < 15 && sc.cooldownMin >= 15 && sc.sqsDepth === 0;
+        const canScaleOutEc2 = !dbRedOrAmber;
+        const isSre = currentRole === 'DEVOPS_SRE';
+
+        const userPct = Math.min(100, Math.round((sc.users1m / scale.maxUsers) * 100));
+        const computePct = Math.min(100, Math.round(Math.max(
+          (sc.lambdaConc / Math.max(1, scale.lambdaRes)) * 100,
+          sc.apiCpu,
+          (sc.apiRunning / scale.apiCeil) * 100
+        )));
+        const dbPct = Math.min(100, Math.round(Math.max(
+          (sc.dbConn / scale.maxConn) * 100,
+          (sc.writeIops / scale.maxIops) * 100,
+          (sc.dirtyPct / 20) * 100,
+          sc.dbCpu
+        )));
+
+        const projectedSockets = (sc.lambdaConc * 2 * 3) + (sc.apiRunning * 20);
+        const headroomPct = Math.max(0, Math.round((1 - projectedSockets / scale.maxConn) * 100));
+
+        return { dbRedOrAmber, examActive, safetyDownOk, canScaleOutEc2, isSre, userPct, computePct, dbPct, projectedSockets, headroomPct };
+      }
+
+      function fillClass(pct, warn = 70, red = 85) {
+        if (pct >= red) return 'fill-red';
+        if (pct >= warn) return 'fill-amber';
+        return 'fill-green';
+      }
+
+      function statusBadge(level, text) {
+        const cls = level === 'red' ? 'badge-red' : level === 'amber' ? 'badge-amber' : 'badge-green';
+        return `<span class="badge ${cls}">${text}</span>`;
+      }
+
+      function renderAll() {
+        const sc = SCENARIOS[currentScenarioKey];
+        const scale = SCALE_CONFIGS[currentScaleKey];
+        const sf = computeSafety(sc, scale);
+
+        $('hdr-clock-badge').textContent = `Khung giờ mẫu: ${sc.clock}`;
+
+        // --- TAB 1: NON-TECH DUTY ---
+        const banner = $('duty-banner');
+        banner.className = `status-banner status-${sc.severity}`;
+        $('duty-dot').className = `status-dot dot-${sc.severity}`;
+        $('duty-status-title').textContent = sc.bannerTitle;
+        $('duty-status-desc').textContent = sc.bannerDesc;
+
+        $('duty-online-1m').innerHTML = `${sc.users1m.toLocaleString('vi-VN')} <span style="font-size:14px;font-weight:500;color:var(--text-muted)">thí sinh (1m)</span>`;
+        $('duty-online-windows').textContent = `5m: ${sc.users5m.toLocaleString('vi-VN')} | 30m: ${sc.users30m.toLocaleString('vi-VN')} | Mốc đang warm: ${scale.label} (${scale.dbTier})`;
+        $('funnel-wait').textContent = sc.wait.toLocaleString('vi-VN');
+        $('funnel-active').textContent = sc.active.toLocaleString('vi-VN');
+        $('funnel-submit').textContent = sc.submit.toLocaleString('vi-VN');
+        $('funnel-conv').innerHTML = `Tỉ lệ vào thi &amp; nộp thành công: <strong style="color:${sc.conv >= 98 ? 'var(--green)' : sc.conv >= 95 ? 'var(--amber)' : 'var(--red)'}">${sc.conv}%</strong>`;
+
+        $('duty-p95').textContent = `${sc.p95} ms`;
+        $('duty-err-rate').textContent = `${sc.errRate}%`;
+        $('duty-wr-queue').textContent = sc.wrQueue > 0 ? `${sc.wrQueue.toLocaleString('vi-VN')} (~${sc.wrEtaMin}p)` : '0 người';
+        $('duty-retry-ok').textContent = sc.retryFail === 0 ? '100% OK' : `${(100 - sc.retryFail).toFixed(1)}% (Rớt ${sc.retryFail}%)`;
+        $('duty-ux-badge').className = `badge badge-${sc.p95 > 800 || sc.errRate > 1 ? 'red' : sc.p95 > 300 || sc.wrQueue > 0 ? 'amber' : 'green'}`;
+        $('duty-ux-badge').textContent = sc.p95 > 800 ? 'Chậm rõ rệt' : sc.wrQueue > 0 ? 'Đang xếp hàng nhẹ' : 'Mượt mà';
+        $('duty-eta-text').textContent = sc.etaText;
+
+        $('pct-users-label').textContent = `${sf.userPct}%`;
+        $('pct-users-bar').style.width = `${sf.userPct}%`;
+        $('pct-users-bar').className = `meter-fill ${fillClass(sf.userPct, 75, 95)}`;
+
+        $('pct-compute-label').textContent = `${sf.computePct}%`;
+        $('pct-compute-bar').style.width = `${sf.computePct}%`;
+        $('pct-compute-bar').className = `meter-fill ${fillClass(sf.computePct, 70, 85)}`;
+
+        $('pct-db-label').textContent = `${sf.dbPct}%`;
+        $('pct-db-bar').style.width = `${sf.dbPct}%`;
+        $('pct-db-bar').className = `meter-fill ${fillClass(sf.dbPct, 70, 85)}`;
+
+        const gateBadge = $('duty-gate-badge');
+        if (sf.canScaleOutEc2) {
+          gateBadge.className = 'badge badge-green';
+          gateBadge.textContent = 'Scaling Gate: OK';
+          $('duty-gate-note').textContent = 'Database đang khỏe. Nếu Web chậm, được phép mở trần tăng thêm máy chủ EC2 ASG.';
+        } else {
+          gateBadge.className = 'badge badge-red';
+          gateBadge.textContent = 'Scaling Gate: LOCK';
+          $('duty-gate-note').innerHTML = '<strong style="color:#fca5a5">KHÓA TĂNG EC2 ASG:</strong> Database đang chịu áp lực cao. Tuyệt đối KHÔNG mở thêm máy chủ Web để tránh làm sập DB.';
+        }
+
+        const okCount = sc.readiness.filter((r) => r.ok).length;
+        $('readiness-score-badge').className = `badge ${okCount === 4 ? 'badge-green' : okCount === 3 ? 'badge-amber' : 'badge-red'}`;
+        $('readiness-score-badge').textContent = `${okCount} / 4 Đạt`;
+        $('readiness-list').innerHTML = sc.readiness.map((item) => `
+          <li>
+            <span>${item.text}</span>
+            <span class="badge ${item.ok ? 'badge-green' : 'badge-red'}">${item.ok ? 'ĐẠT' : 'LỖI'}</span>
+          </li>
+        `).join('');
+
+        $('duty-sop-subtitle').textContent = sc.sop.badge;
+        $('duty-sop-card').innerHTML = `<strong>${sc.sop.title}</strong><div style="margin-top:4px;color:var(--text-muted)">${sc.sop.summary}</div>`;
+        $('duty-sop-steps').innerHTML = sc.sop.steps.map((s) => `<li>${s}</li>`).join('');
+
+        // --- TAB 2: DEVOPS TECHNICAL ---
+        $('devops-synthetic-kpis').innerHTML = `
+          <article class="card">
+            <div class="card-sub">Socket Headroom Forecast (M60)</div>
+            <div class="kpi-value" style="color:${sf.headroomPct < 20 ? 'var(--red)' : sf.headroomPct < 40 ? 'var(--amber)' : 'var(--green)'}">${sf.headroomPct}% dư</div>
+            <div class="kpi-meta">Dự báo: ${sf.projectedSockets.toLocaleString('vi-VN')} / ${scale.maxConn.toLocaleString('vi-VN')} sockets (Conn × 2 × 3 nodes)</div>
+          </article>
+          <article class="card">
+            <div class="card-sub">Lambda Scale Velocity (vs +500/p)</div>
+            <div class="kpi-value" style="color:${sc.lambdaVel > 450 ? 'var(--red)' : sc.lambdaVel > 350 ? 'var(--amber)' : 'var(--green)'}">+${sc.lambdaVel}/phút</div>
+            <div class="kpi-meta">Throttles: ${sc.lambdaThrottles}/p | Reserved: ${scale.lambdaRes.toLocaleString('vi-VN')}</div>
+          </article>
+          <article class="card">
+            <div class="card-sub">WiredTiger Dirty Cache (Gate 15%)</div>
+            <div class="kpi-value" style="color:${sc.dirtyPct >= 20 ? 'var(--red)' : sc.dirtyPct >= 15 ? 'var(--amber)' : 'var(--green)'}">${sc.dirtyPct}%</div>
+            <div class="kpi-meta">Tickets Write: ${sc.ticketsWrite}/128 | Writer Queue: ${sc.writerQueue}</div>
+          </article>
+          <article class="card">
+            <div class="card-sub">COLLSCAN Ratio &amp; NAT SNAT</div>
+            <div class="kpi-value" style="color:${sc.collscanRatio > 20 || sc.natPortErr > 0 ? 'var(--red)' : 'var(--sky)'}">${sc.collscanRatio}:1</div>
+            <div class="kpi-meta">NAT ErrorPortAllocation: ${sc.natPortErr} | TLS: ${sc.dbTlsMs}ms</div>
+          </article>
+        `;
+
+        const tLabels = ['-35m', '-30m', '-25m', '-20m', '-15m', '-10m', '-5m', 'Now'];
+        $('chart-conn-badge').textContent = `${sc.dbConn.toLocaleString('vi-VN')} / ${scale.maxConn.toLocaleString('vi-VN')}`;
+        renderSvgChart('svg-conn-chart', {
+          points: sc.series.conn, maxY: Math.max(scale.maxConn * 1.05, 34000),
+          limitY: scale.maxConn, warnY: Math.round(scale.maxConn * 0.78),
+          color: '#38bdf8', unit: '', labels: tLabels
+        });
+
+        $('chart-lambda-badge').textContent = `${sc.lambdaConc.toLocaleString('vi-VN')} / ${scale.lambdaRes.toLocaleString('vi-VN')}`;
+        renderSvgChart('svg-lambda-chart', {
+          points: sc.series.lambda, maxY: Math.max(scale.lambdaRes * 1.1, 3300),
+          limitY: scale.lambdaRes, warnY: scale.lambdaProv || null,
+          color: '#a78bfa', unit: '', labels: tLabels
+        });
+
+        $('chart-iops-badge').textContent = `${sc.writeIops.toLocaleString('vi-VN')} IOPS | ${sc.dirtyPct}%`;
+        renderSvgChart('svg-iops-chart', {
+          points: sc.series.iops, maxY: Math.max(scale.maxIops * 1.1, 11000),
+          limitY: scale.maxIops, warnY: Math.round(scale.maxIops * 0.8),
+          color: '#10b981', unit: '', labels: tLabels,
+          secondPoints: sc.series.dirty.map((d) => d * 400), secondColor: '#f59e0b'
+        });
+
+        // DB Table
+        $('tbody-db-metrics').innerHTML = [
+          ['CONNECTIONS & % Max', `${sc.dbConn.toLocaleString('vi-VN')} (${Math.round(sc.dbConn / scale.maxConn * 100)}%)`, `${sc.c1Conn.toLocaleString('vi-VN')} (${Math.round(sc.c1Conn / scale.maxConn * 100)}%)`, `Warn 15K | Red 25K | Max ${scale.maxConn.toLocaleString('vi-VN')}`, sc.dbConn >= 25000 ? statusBadge('red', 'BÃO KẾT NỐI (SOP S2)') : statusBadge('green', 'Trong ngưỡng M60')],
+          ['Connection Churn & TLS ms', `+${sc.dbChurn}/p | TLS ${sc.dbTlsMs}ms`, `+${Math.round(sc.dbChurn * 0.6)}/p | TLS ${Math.round(sc.dbTlsMs * 0.8)}ms`, '< 2.000/p & TLS < 50ms', sc.dbTlsMs > 150 ? statusBadge('red', 'Nghẽn bắt tay TLS') : statusBadge('green', 'Ổn định')],
+          ['CPU % & IOWAIT %', `CPU ${sc.dbCpu}% | IO ${sc.dbIowait}%`, `CPU ${sc.c1Cpu}%`, 'CPU < 65% | IO < 15%', sc.c1Cpu >= 85 ? statusBadge('red', 'Cluster1 Quá tải (SOP S3)') : sc.dbCpu >= 75 ? statusBadge('amber', 'Tải cao') : statusBadge('green', 'Xanh')],
+          ['Write IOPS & Read IOPS', `W: ${sc.writeIops.toLocaleString('vi-VN')} | R: ${sc.readIops.toLocaleString('vi-VN')}`, 'W: 3.100 | R: 4.050', `Max ${scale.maxIops.toLocaleString('vi-VN')} (Red >= 85%)`, sc.writeIops >= 8500 ? statusBadge('red', 'Nghẽn Write IOPS (SOP S1)') : statusBadge('green', 'Bình thường')],
+          ['WiredTiger Dirty Cache % (Mới Live)', `${sc.dirtyPct}%`, `${Math.max(3, (sc.dirtyPct * 0.55).toFixed(1))}%`, 'Safety Gate < 15% | Red > 20%', sc.dirtyPct >= 20 ? statusBadge('red', 'Xả đĩa không kịp') : sc.dirtyPct >= 15 ? statusBadge('amber', 'Khóa Scale Down') : statusBadge('green', 'Đạt Safety Gate')],
+          ['Tickets Available Writes & Queue (Mới Live)', `${sc.ticketsWrite}/128 | Q: ${sc.writerQueue}`, '128/128 | Q: 0', 'Tickets >= 96 | Queue = 0', sc.writerQueue > 0 ? statusBadge('red', 'Đang xếp hàng khóa ghi') : statusBadge('green', 'Thông suốt')],
+          ['COLLSCAN Ratio & Oplog Lag (Mới)', `${sc.collscanRatio}:1 | Lag ${sc.oplogLag}s`, `${sc.c1Cpu >= 85 ? '38.4:1 (Nặng)' : '2.5:1'}`, 'Ratio <= 5:1 | Lag < 2s', sc.collscanRatio > 20 || sc.c1Cpu >= 85 ? statusBadge('red', 'Cần kiểm tra Index / Slow Op') : statusBadge('green', 'Index hiệu quả')]
+        ].map(([name, ce, c1, gate, st]) => `
+          <tr>
+            <th scope="row">${name}</th>
+            <td data-label="cluster-exam">${ce}</td>
+            <td data-label="Cluster1">${c1}</td>
+            <td data-label="Ngưỡng / Gate">${gate}</td>
+            <td data-label="Trạng thái">${st}</td>
+          </tr>
+        `).join('');
+
+        // Infra Table
+        $('tbody-infra-metrics').innerHTML = [
+          ['Tầng 1: Cloudflare & Edge', `Waiting Room: ${sc.wrQueue} người (${sc.wrEtaMin}p) | 429 Retry Fail: ${sc.retryFail}%`, 'Queue = 0 | Fail = 0%', sc.retryFail > 0 ? statusBadge('red', 'Rủi ro mất retry') : sc.wrQueue > 0 ? statusBadge('amber', 'Đang điều tiết Edge') : statusBadge('green', 'Bypass'), 'Van xả áp Edge bảo vệ Origin & DB'],
+          ['Tầng 2: examination-lambda', `Concurrent: ${sc.lambdaConc} | Velocity: +${sc.lambdaVel}/p | Throttles: ${sc.lambdaThrottles}/p | p95: ${sc.lambdaP95}ms`, `Res ${scale.lambdaRes} | Prov ${scale.lambdaProv} | Burst +500/p`, sc.lambdaThrottles > 0 ? statusBadge('red', 'Throttle (SOP S4)') : statusBadge('green', 'Xanh'), `RAM thực dùng ${sc.lambdaRamPct}% / 4096 MB (~${Math.round(40.96 * sc.lambdaRamPct)} MB), timeout 20s`],
+          ['Tầng 2: oauth & event-monitor + SQS', `OAuth: ${sc.oauthConc}/500 | event-mon Res: ${sc.eventMonRes} | SQS: ${sc.sqsDepth} msgs (${sc.sqsAge}s)`, 'OAuth 500 | SQS < 50K', sc.oauthConc > 450 ? statusBadge('amber', 'OAuth tiệm cận trần') : statusBadge('green', 'Ổn định'), 'event-monitor có Circuit Breaker về SQS khi DB nghẽn'],
+          ['Tầng 3: EC2 ASG (api-elb & oauth)', `api-elb: ${sc.apiRunning}/${sc.apiDesired} VMs (CPU ${sc.apiCpu}%) | oauth: ${sc.oauthRunning}/${sc.oauthDesired} (CPU ${sc.oauthCpu}%) | UnHealthy: ${sc.unhealthyHosts}`, `Pre-warm 38-50 | Trần 70 | Suspend ScaleIn: ${sc.scaleInSuspended ? 'ON' : 'OFF'}`, sc.unhealthyHosts > 0 ? statusBadge('red', 'Rớt HealthCheck') : sc.apiCpu >= 85 ? statusBadge('amber', 'Chạm trần Web (SOP S5)') : statusBadge('green', 'Ổn định'), sf.canScaleOutEc2 ? 'Được phép mở trần nếu thiếu CPU' : 'ĐANG KHÓA Scale-Out vì DB Vàng/Đỏ'],
+          ['Tầng 3: NAT Gateway & Redis SSO', `NAT ErrorPortAllocation: ${sc.natPortErr} | Redis CPU: ${sc.redisCpu}% | Evictions: ${sc.redisEvictions}`, 'NAT Err = 0 | Redis Evictions = 0', sc.natPortErr > 0 || sc.redisEvictions > 0 ? statusBadge('red', 'Nghẽn SNAT / Session') : statusBadge('green', 'Khỏe'), 'Theo dõi SNAT pool (172.31.*) tránh nghẽn TLS']
+        ].map(([layer, cur, lim, st, note]) => `
+          <tr>
+            <th scope="row">${layer}</th>
+            <td data-label="Giá trị">${cur}</td>
+            <td data-label="Giới hạn">${lim}</td>
+            <td data-label="Trạng thái">${st}</td>
+            <td data-label="Phân tích">${note}</td>
+          </tr>
+        `).join('');
+
+        // --- TAB 3: CONTROL PLANE ---
+        renderControls(sc, scale, sf);
+        renderAuditLog();
+      }
+
+      function renderControls(sc, scale, sf) {
+        $('interlock-status-grid').innerHTML = `
+          <div class="notice-box" style="border-color:${sf.canScaleOutEc2 ? 'var(--green)' : 'var(--red)'}">
+            <strong>Interlock 1 (EC2 Scale-Out):</strong> ${sf.canScaleOutEc2 ? '<span style="color:#6ee7b7">MỞ (DB Xanh)</span>' : '<span style="color:#fca5a5">KHÓA (DB đang Vàng/Đỏ — Cấm thêm VM)</span>'}
+          </div>
+          <div class="notice-box" style="border-color:${sf.examActive ? 'var(--red)' : 'var(--green)'}">
+            <strong>Interlock 2 (DB Tier Change):</strong> ${sf.examActive ? '<span style="color:#fca5a5">KHÓA TRONG CA THI (Phải xong trước T-4h)</span>' : '<span style="color:#6ee7b7">MỞ (Ngoài giờ thi)</span>'}
+          </div>
+          <div class="notice-box" style="border-color:${sf.safetyDownOk ? 'var(--green)' : 'var(--amber)'}">
+            <strong>Interlock 3 (Safety Scale-Down 5/5):</strong> ${sf.safetyDownOk ? '<span style="color:#6ee7b7">ĐỦ 5/5 (Sau 21:45, Dirty ' + sc.dirtyPct + '% &lt; 15%)</span>' : '<span style="color:#fcd34d">KHÓA (Chưa qua 21:45 hoặc Dirty/SQS chưa sạch)</span>'}
+          </div>
+        `;
+
+        // Khối 1: Preset
+        const presets = [
+          { id: 'preset-p1', label: 'Preset ~60K Pha 1 (Prov 1.200 + ASG 50)', detail: 'preset.fanout', target: 'P1 19:15-19:45 (~60K)', diff: 'Lambda Prov: -> 1200\nASG api-elb: -> 50 (Suspend ScaleIn)', payload: { preset: 'EXAM_60K_P1', lambdaProvisioned: 1200, asgApiDesired: 50, suspendScaleIn: true }, enabled: true },
+          { id: 'preset-30k', label: 'Preset <30K (M50 / Prov 600 / ASG 25)', detail: 'preset.fanout', target: 'Mốc <30K', diff: 'Lambda Prov: -> 600\nASG api-elb: -> 25', payload: { preset: 'EXAM_30K', lambdaProvisioned: 600, asgApiDesired: 25 }, enabled: true },
+          { id: 'preset-standby', label: 'Hạ tải Standby (Sau 21:45)', detail: 'preset.fanout', target: 'Standby (Safety Gate 5/5)', diff: 'Lambda Prov: 1200 -> 0\nASG ScaleIn: Resume -> Min 2', payload: { preset: 'POST_EXAM_STANDBY', verifySafetyGate: true }, enabled: sf.safetyDownOk, reason: 'Chưa đủ 5/5 điều kiện Safety Gate sau 21:45' }
+        ];
+        renderBtnGroup('ctrl-preset-buttons', presets);
+
+        // Khối 2: DB
+        const dbActions = [
+          { id: 'db-check', label: 'Kiểm tra Pre-Exam Health & Rolling Update', detail: 'atlas.rolling_status.check', target: 'cluster-exam & Cluster1', diff: 'Verify 3/3 Healthy, No disk rolling update, Dirty < 15%', payload: { action: 'HEALTH_GATE_CHECK', clusters: ['cluster-exam', 'Cluster1'] }, enabled: true },
+          { id: 'db-scale-down', label: 'Scale Down Atlas Tier (M60 -> M30/Standby)', detail: 'atlas.tier.scale', target: 'cluster-exam (M60)', diff: 'Tier: M60 -> M30 (Qua SafetyChecker 5/5)', payload: { action: 'SCALE_TIER', cluster: 'cluster-exam', targetTier: 'M30', safetyGate: 'PASSED_5_OF_5' }, enabled: sf.isSre && sf.safetyDownOk, reason: !sf.isSre ? 'Chỉ DEVOPS_SRE mới có quyền' : 'Khóa: Phải sau 21:45 & Dirty Cache < 15%' },
+          { id: 'db-scale-hot', label: 'Đổi DB Tier nóng giữa giờ thi', detail: 'atlas.tier.scale', target: 'cluster-exam', diff: 'BLOCKED BY POLICY', payload: {}, enabled: false, reason: 'CẤM TUYỆT ĐỐI: Gây ReplicaSetNoPrimary 24.3s (Sự cố 29/10)' }
+        ];
+        renderBtnGroup('ctrl-db-buttons', dbActions, 'btn-amber');
+
+        // Khối 3: Lambda
+        const lambdaActions = [
+          { id: 'lam-cb-off', label: 'Circuit Breaker: Tắt event-monitor (Reserved = 0 -> SQS)', detail: 'lambda.circuit_breaker.mute_event_monitor', target: 'event-monitor', diff: `ReservedConcurrency: ${sc.eventMonRes} -> 0\nSQS Buffering: ENABLED`, payload: { functionName: 'event-monitor', reservedConcurrency: 0, reason: 'SOP_S1_PROTECT_DB_IOPS' }, enabled: true, cls: 'btn-red' },
+          { id: 'lam-cb-on', label: 'Khôi phục event-monitor (Reserved = 50 xả SQS)', detail: 'lambda.circuit_breaker.mute_event_monitor', target: 'event-monitor', diff: 'ReservedConcurrency: 0 -> 50 (Drain SQS chậm)', payload: { functionName: 'event-monitor', reservedConcurrency: 50 }, enabled: sf.safetyDownOk || !sf.dbRedOrAmber, reason: 'DB đang căng thẳng, chưa nên xả SQS' },
+          { id: 'lam-prov-up', label: 'Tăng Provisioned examination-lambda (1200 -> 1800)', detail: 'lambda.concurrency.set_provisioned', target: 'examination-lambda', diff: `ProvisionedConcurrency: ${scale.lambdaProv} -> 1800`, payload: { functionName: 'examination-lambda', provisionedConcurrency: 1800 }, enabled: false && sf.isSre, reason: 'Vượt giới hạn cứng Provisioned ≤ 1.200' }
+        ];
+        renderBtnGroup('ctrl-lambda-buttons', lambdaActions);
+
+        // Khối 4: EC2 & Edge
+        const ec2Actions = [
+          { id: 'ec2-scale-60', label: 'Mở trần EC2 api-elb (50 -> 60 VMs, Max 70)', detail: 'asg.capacity.update', target: 'ASG api-elb', diff: `Desired: ${sc.apiDesired} -> 60 | Max: 70`, payload: { asgName: 'api-elb', desiredCapacity: 60, maxSize: 70 }, enabled: sf.canScaleOutEc2, reason: 'Interlock KHÓA: DB đang Vàng/Đỏ — Cấm thêm Web VM' },
+          { id: 'edge-wr-on', label: 'Bật Cloudflare Waiting Room (Làm phẳng 500/phút)', detail: 'cloudflare.waiting_room.toggle', target: 'Cloudflare Waiting Room', diff: 'Status: BYPASS -> ACTIVE (500 users/min)', payload: { provider: 'cloudflare', waitingRoom: 'ACTIVE', newUsersPerMinute: 500 }, enabled: true, cls: 'btn-amber' },
+          { id: 'edge-wr-off', label: 'Tắt Cloudflare Waiting Room (Bypass)', detail: 'cloudflare.waiting_room.toggle', target: 'Cloudflare Waiting Room', diff: 'Status: ACTIVE -> BYPASS', payload: { provider: 'cloudflare', waitingRoom: 'BYPASS' }, enabled: true, cls: 'btn-green' }
+        ];
+        renderBtnGroup('ctrl-ec2-buttons', ec2Actions);
+      }
+
+      function renderBtnGroup(containerId, items, defaultCls = '') {
+        const box = $(containerId);
+        box.innerHTML = '';
+        items.forEach((item) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `btn ${item.cls || defaultCls}`;
+          btn.textContent = item.label;
+          // RBAC (spec §7.1): L1 chỉ ACK/Mute/Yêu cầu L2 — mọi nút hạ tầng bị khóa
+          const l1Locked = currentRole !== 'DEVOPS_SRE';
+          const enabled = item.enabled && !l1Locked;
+          const reason = l1Locked ? 'Chỉ DEVOPS_SRE — L1 dùng nút Yêu cầu L2 kích hoạt SOP' : item.reason;
+          btn.disabled = !enabled;
+          if (!enabled && reason) {
+            btn.title = reason;
+            btn.textContent += ` [Khóa: ${reason}]`;
+          }
+          btn.addEventListener('click', () => openConfirmDialog(item));
+          box.appendChild(btn);
+        });
+      }
+
+      function renderAuditLog() {
+        $('tbody-audit-log').innerHTML = auditEntries.map((row) => `
+          <tr>
+            <th scope="row" class="mono">${row.time}</th>
+            <td data-label="Actor">${row.actor}</td>
+            <td data-label="DetailType">${row.detail}</td>
+            <td data-label="Target">${row.target}</td>
+            <td data-label="Status"><span class="badge ${row.status === 'DRY_RUN' ? 'badge-amber' : 'badge-green'}">${row.status}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      function renderDictionary() {
+        const q = ($('dict-search').value || '').trim().toLowerCase();
+        const f = $('dict-filter').value;
+        const rows = DICTIONARY_ITEMS.filter((item) => {
+          if (f === 'new' && !item.isNew) return false;
+          if (f.startsWith('L') && item.layer !== f) return false;
+          if (!q) return true;
+          return (item.tech + ' ' + item.duty + ' ' + item.desc + ' ' + item.action).toLowerCase().includes(q);
+        });
+        $('tbody-dictionary').innerHTML = rows.map((item) => `
+          <tr>
+            <th scope="row">
+              <div><code>${item.tech}</code></div>
+              <div style="margin-top:4px;display:flex;gap:5px;flex-wrap:wrap;">
+                <span class="badge badge-slate">${item.layer}</span>
+                ${item.isNew ? '<span class="badge badge-purple">MỚI BỔ SUNG</span>' : '<span class="badge badge-sky">Đã có trong Spec</span>'}
+              </div>
+            </th>
+            <td data-label="Tên Trực Thi"><strong>${item.duty}</strong></td>
+            <td data-label="Ý nghĩa">${item.desc}</td>
+            <td data-label="Ngưỡng X/V/Đ" class="mono" style="font-size:12px;">${item.thresh}</td>
+            <td data-label="Hành động SOP">${item.action}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="5">Không tìm thấy chỉ số phù hợp.</td></tr>';
+      }
+
+      // =========================================================================
+      // 5. NATIVE DIALOG CONFIRMATION (modern-web-guidance compliant)
+      // =========================================================================
+      const confirmDialog = $('confirm-dialog');
+
+      function openConfirmDialog(action) {
+        pendingAction = action;
+        const isDry = $('chk-dry-run').checked;
+        $('dlg-mode-badge').textContent = isDry ? 'DRY-RUN MODE' : 'LIVE EXECUTION';
+        $('dlg-mode-badge').className = `badge ${isDry ? 'badge-amber' : 'badge-red'}`;
+        $('dlg-summary').innerHTML = `<strong>Vai trò thực thi:</strong> ${currentRole}<br><strong>Hành động:</strong> ${action.label}<br><strong>Mục tiêu:</strong> ${action.target}`;
+        $('dlg-diff').textContent = action.diff;
+        const fullPayload = {
+          EventBusName: 'edmicro-exam-ops-bus',
+          Source: 'edmicro.monitor.control',
+          DetailType: action.detail,
+          Detail: Object.assign({ schema_version: '2.0', action_id: 'act-demo-' + Date.now(), role: currentRole, dry_run: isDry, requested_at_utc: new Date().toISOString() }, action.payload)
+        };
+        $('dlg-payload').textContent = JSON.stringify(fullPayload, null, 2);
+        $('dlg-confirm-btn').textContent = isDry ? 'Chạy Dry-Run (Không đổi hệ thống)' : 'Xác nhận Gửi EventBridge';
+        confirmDialog.showModal();
+      }
+
+      confirmDialog.addEventListener('close', () => {
+        const result = confirmDialog.returnValue;
+        confirmDialog.returnValue = ''; // Reset immediately per modern-web-guidance
+        if (result === 'confirm' && pendingAction) {
+          const isDry = $('chk-dry-run').checked;
+          const now = new Date().toTimeString().slice(0, 8);
+          auditEntries.unshift({
+            time: now,
+            actor: `demo-user (${currentRole})`,
+            detail: `${pendingAction.detail} / ${pendingAction.label}`,
+            target: pendingAction.target,
+            status: isDry ? 'DRY_RUN' : 'DISPATCHED'
+          });
+          if (!isDry && pendingAction.id === 'lam-cb-off') {
+            SCENARIOS[currentScenarioKey].eventMonRes = 0;
+            SCENARIOS[currentScenarioKey].sqsDepth += 600;
+            SCENARIOS[currentScenarioKey].writeIops = Math.max(2500, Math.round(SCENARIOS[currentScenarioKey].writeIops * 0.72));
+            SCENARIOS[currentScenarioKey].dirtyPct = Math.max(8, Number((SCENARIOS[currentScenarioKey].dirtyPct * 0.74).toFixed(1)));
+          } else if (!isDry && pendingAction.id === 'edge-wr-on') {
+            SCENARIOS[currentScenarioKey].wrQueue = 500;
+            SCENARIOS[currentScenarioKey].wrEtaMin = 1.0;
+          } else if (!isDry && pendingAction.id === 'edge-wr-off') {
+            SCENARIOS[currentScenarioKey].wrQueue = 0;
+            SCENARIOS[currentScenarioKey].wrEtaMin = 0;
+          } else if (!isDry && pendingAction.id === 'ec2-scale-60') {
+            SCENARIOS[currentScenarioKey].apiDesired = 60;
+            SCENARIOS[currentScenarioKey].apiRunning = 60;
+            SCENARIOS[currentScenarioKey].apiCpu = Math.round(SCENARIOS[currentScenarioKey].apiCpu * 0.8);
+          }
+          renderAll();
+          showToast(`${isDry ? '[Dry-Run] ' : '[EventBridge] '}Đã gửi lệnh: ${pendingAction.label}`, isDry ? 'amber' : 'green');
+        }
+        pendingAction = null;
+      });
+
+      // Fallback light-dismiss only when closedBy="any" is unsupported
+      if (!('closedBy' in HTMLDialogElement.prototype)) {
+        let downOutside = false;
+        confirmDialog.addEventListener('pointerdown', (e) => {
+          const rect = confirmDialog.getBoundingClientRect();
+          downOutside = e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom;
+        });
+        confirmDialog.addEventListener('pointerup', (e) => {
+          if (!downOutside) return;
+          const rect = confirmDialog.getBoundingClientRect();
+          const upOutside = e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom;
+          if (upOutside) confirmDialog.close('cancel');
+        });
+      }
+
+      // =========================================================================
+      // 6. EVENT WIRING
+      // =========================================================================
+      $('scenario-select').addEventListener('change', (e) => {
+        currentScenarioKey = e.target.value;
+        renderAll();
+      });
+
+      document.querySelectorAll('.scale-pill').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          currentScaleKey = btn.dataset.scale;
+          document.querySelectorAll('.scale-pill').forEach((b) => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+          renderAll();
+        });
+      });
+
+      $('rbac-select').addEventListener('change', (e) => {
+        currentRole = e.target.value;
+        renderAll();
+        showToast(`Đã chuyển vai trò RBAC: ${currentRole}`);
+      });
+
+      $('chk-dry-run').addEventListener('change', () => {
+        showToast($('chk-dry-run').checked ? 'Đã bật chế độ Dry-Run (Chỉ xem Diff)' : 'Đã tắt Dry-Run (Sẵn sàng gửi EventBridge)');
+      });
+
+      $('btn-jump-control').addEventListener('click', () => selectTab(2, true));
+      $('btn-ack-alert').addEventListener('click', () => showToast('Đã xác nhận ACK cảnh báo cho ca trực hiện tại.', 'green'));
+      $('btn-mute-alert').addEventListener('click', () => showToast('Đã tạm tắt âm thanh chuông cảnh báo trong 5 phút.', 'amber'));
+      $('btn-copy-duty').addEventListener('click', async () => {
+        const sc = SCENARIOS[currentScenarioKey];
+        const msg = `[monitor.edmicro.io | ${sc.clock}] ${sc.bannerTitle} | Online 1m: ${sc.users1m.toLocaleString('vi-VN')} | DB M60 Conn: ${sc.dbConn.toLocaleString('vi-VN')}/32K, Write IOPS: ${sc.writeIops}/10K, Dirty Cache: ${sc.dirtyPct}% | Lambda Throttles: ${sc.lambdaThrottles}/p. Đề nghị: ${sc.sop.title}`;
+        try {
+          await navigator.clipboard.writeText(msg);
+          showToast('Đã copy tin nhắn báo DevOps vào Clipboard!', 'green');
+        } catch {
+          showToast(msg, 'sky');
+        }
+      });
+
+      $('btn-clear-audit').addEventListener('click', () => {
+        auditEntries = [];
+        renderAuditLog();
+        showToast('Đã xóa nhật ký mô phỏng.');
+      });
+
+      $('dict-search').addEventListener('input', renderDictionary);
+      $('dict-filter').addEventListener('change', renderDictionary);
+
+      // Initial render
+      renderAll();
+      renderDictionary();
+    })();
+  </script>
+</body>
+</html>

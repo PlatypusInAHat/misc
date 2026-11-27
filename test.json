@@ -1,0 +1,2048 @@
+{
+ "apiVersion": "dashboard.grafana.app/v2",
+ "kind": "Dashboard",
+ "metadata": {
+  "name": "health-overview",
+  "namespace": "default"
+ },
+ "spec": {
+  "annotations": [
+   {
+    "kind": "AnnotationQuery",
+    "spec": {
+     "query": {
+      "kind": "DataQuery",
+      "group": "grafana",
+      "version": "v0",
+      "datasource": {
+       "name": "-- Grafana --"
+      },
+      "spec": {}
+     },
+     "enable": true,
+     "hide": true,
+     "iconColor": "rgba(0, 211, 255, 1)",
+     "name": "Annotations & Alerts",
+     "builtIn": true,
+     "legacyOptions": {
+      "type": "dashboard"
+     }
+    }
+   }
+  ],
+  "cursorSync": "Crosshair",
+  "editable": true,
+  "elements": {
+   "panel-1": {
+    "kind": "Panel",
+    "spec": {
+     "id": 1,
+     "title": "",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "text",
+      "version": "",
+      "spec": {
+       "options": {
+        "mode": "markdown",
+        "content": "# Hệ thống theo dõi sức khỏe hệ thống\n**Đăng nhập · Thi · Học tập · Hạ tầng**  ·  làm mới mỗi 15 giây, hiển thị 30 phút gần nhất"
+       },
+       "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-2": {
+    "kind": "Panel",
+    "spec": {
+     "id": 2,
+     "title": "Cập nhật lần cuối",
+     "description": "Thời điểm Prometheus thu số liệu gần nhất.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "timestamp(up{job=\"prometheus\"}) * 1000",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "dateTimeAsLocal",
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "text"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-3": {
+    "kind": "Panel",
+    "spec": {
+     "id": 3,
+     "title": "Cảnh báo đang bật",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "count((time() - ALERTS_FOR_STATE{alertname!=\"Watchdog\"}) and ignoring(alertstate) ALERTS{alertstate=\"firing\",alertname!=\"Watchdog\"}) or vector(0)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short",
+         "decimals": 0,
+         "noValue": "0",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 1,
+            "color": "orange"
+           }
+          ]
+         },
+         "mappings": [
+          {
+           "type": "value",
+           "options": {
+            "0": {
+             "text": "Không có",
+             "color": "blue",
+             "index": 0
+            }
+           }
+          }
+         ]
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-4": {
+    "kind": "Panel",
+    "spec": {
+     "id": 4,
+     "title": "Trạng thái chung",
+     "description": "Đỏ nếu có cảnh báo mức nghiêm trọng, cam nếu có cảnh báo thường, xanh nếu không có gì.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "clamp_max((count(ALERTS{alertstate=\"firing\",alertname!=\"Watchdog\",severity=\"critical\"}) or vector(0)), 1) * 2 + (clamp_max((count(ALERTS{alertstate=\"firing\",alertname!=\"Watchdog\",severity=\"critical\"}) or vector(0)), 1) == bool 0) * clamp_max((count(ALERTS{alertstate=\"firing\",alertname!=\"Watchdog\",severity=\"warning\"}) or vector(0)), 1)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "value"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 1,
+            "color": "orange"
+           },
+           {
+            "value": 2,
+            "color": "red"
+           }
+          ]
+         },
+         "mappings": [
+          {
+           "type": "value",
+           "options": {
+            "0": {
+             "text": "BÌNH THƯỜNG",
+             "color": "blue",
+             "index": 0
+            },
+            "1": {
+             "text": "CÓ CẢNH BÁO",
+             "color": "orange",
+             "index": 1
+            },
+            "2": {
+             "text": "CÓ SỰ CỐ",
+             "color": "red",
+             "index": 2
+            }
+           }
+          }
+         ]
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-5": {
+    "kind": "Panel",
+    "spec": {
+     "id": 5,
+     "title": "Cảnh báo đang bật (xếp theo mức độ)",
+     "description": "Lấy từ các luật cảnh báo của Prometheus. Rỗng nghĩa là không có cảnh báo nào đang bật.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "max by (a_muc, b_ten, c_anh_huong) (label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(((time() - ALERTS_FOR_STATE{alertname!=\"Watchdog\"}) and ignoring(alertstate) ALERTS{alertstate=\"firing\",alertname!=\"Watchdog\"}), \"a_muc\", \"$1\", \"severity\", \"(.*)\"), \"b_ten\", \"$1\", \"alertname\", \"(.*)\"), \"c_anh_huong\", \"Cần kiểm tra\", \"alertname\", \".*\"), \"b_ten\", \"Mất kết nối giám sát\", \"alertname\", \"TargetDown\"), \"c_anh_huong\", \"Không thu được số liệu từ một thành phần, có thể không thấy sự cố thật.\", \"alertname\", \"TargetDown\"), \"b_ten\", \"Máy chủ quá tải CPU\", \"alertname\", \"HostHighCPU\"), \"c_anh_huong\", \"Dịch vụ chạy trên máy này có thể chậm.\", \"alertname\", \"HostHighCPU\"), \"b_ten\", \"Máy chủ gần hết RAM\", \"alertname\", \"HostHighMemory\"), \"c_anh_huong\", \"Dịch vụ có thể chậm hoặc tự khởi động lại.\", \"alertname\", \"HostHighMemory\"), \"b_ten\", \"Ổ đĩa máy chủ sắp đầy\", \"alertname\", \"HostDiskHigh\"), \"c_anh_huong\", \"Nếu đầy, dịch vụ trên máy sẽ ngừng ghi dữ liệu.\", \"alertname\", \"HostDiskHigh\"), \"b_ten\", \"Ổ đĩa máy chủ gần đầy\", \"alertname\", \"HostDiskCritical\"), \"c_anh_huong\", \"Dịch vụ có thể ngừng hoạt động nếu ổ đĩa đầy.\", \"alertname\", \"HostDiskCritical\"), \"b_ten\", \"Kiểm tra sức khỏe dịch vụ thất bại\", \"alertname\", \"HealthCheckFailed\"), \"c_anh_huong\", \"Dịch vụ có thể không phản hồi.\", \"alertname\", \"HealthCheckFailed\"), \"b_ten\", \"Không còn máy chủ khỏe sau cân bằng tải\", \"alertname\", \"ALBNoHealthyHosts\"), \"c_anh_huong\", \"Người dùng có thể không vào được dịch vụ.\", \"alertname\", \"ALBNoHealthyHosts\"), \"b_ten\", \"Có máy chủ không khỏe sau cân bằng tải\", \"alertname\", \"ALBUnhealthyHosts\"), \"c_anh_huong\", \"Công suất giảm, có thể chậm khi đông người.\", \"alertname\", \"ALBUnhealthyHosts\"), \"b_ten\", \"Tỷ lệ lỗi máy chủ cao\", \"alertname\", \"ALBHigh5xxRate\"), \"c_anh_huong\", \"Một phần người dùng nhận lỗi.\", \"alertname\", \"ALBHigh5xxRate\"), \"b_ten\", \"Dịch vụ phản hồi chậm\", \"alertname\", \"ALBSlowResponse\"), \"c_anh_huong\", \"Người dùng phải chờ lâu hơn, vẫn vào được.\", \"alertname\", \"ALBSlowResponse\"), \"b_ten\", \"Hàm xử lý bị giới hạn tải\", \"alertname\", \"LambdaThrottled\"), \"c_anh_huong\", \"Một số yêu cầu bị từ chối hoặc phải chờ.\", \"alertname\", \"LambdaThrottled\"), \"b_ten\", \"Hàm xử lý lỗi nhiều\", \"alertname\", \"LambdaHighErrorRate\"), \"c_anh_huong\", \"Một số thao tác thất bại, thử lại có thể được.\", \"alertname\", \"LambdaHighErrorRate\"), \"b_ten\", \"Nhóm máy tự mở rộng đang thiếu máy\", \"alertname\", \"ASGBelowDesired\"), \"c_anh_huong\", \"Công suất thấp hơn dự kiến khi đông người.\", \"alertname\", \"ASGBelowDesired\"), \"b_ten\", \"Mất số liệu cơ sở dữ liệu\", \"alertname\", \"AtlasMetricsMissing\"), \"c_anh_huong\", \"Không giám sát được cơ sở dữ liệu.\", \"alertname\", \"AtlasMetricsMissing\"), \"b_ten\", \"Cơ sở dữ liệu không có node chính\", \"alertname\", \"AtlasNoPrimary\"), \"c_anh_huong\", \"Việc ghi dữ liệu có thể thất bại.\", \"alertname\", \"AtlasNoPrimary\"), \"b_ten\", \"Kết nối cơ sở dữ liệu cao\", \"alertname\", \"AtlasConnectionsHigh\"), \"c_anh_huong\", \"Sắp chạm giới hạn kết nối.\", \"alertname\", \"AtlasConnectionsHigh\"), \"b_ten\", \"Kết nối cơ sở dữ liệu gần cạn\", \"alertname\", \"AtlasConnectionsCritical\"), \"c_anh_huong\", \"Có thể không mở thêm được kết nối, gây lỗi hàng loạt.\", \"alertname\", \"AtlasConnectionsCritical\"), \"b_ten\", \"Ổ đĩa cơ sở dữ liệu sắp đầy\", \"alertname\", \"AtlasDiskHigh\"), \"c_anh_huong\", \"Nếu đầy, cơ sở dữ liệu sẽ ngừng ghi.\", \"alertname\", \"AtlasDiskHigh\"), \"b_ten\", \"Ổ đĩa cơ sở dữ liệu gần đầy\", \"alertname\", \"AtlasDiskCritical\"), \"c_anh_huong\", \"Cơ sở dữ liệu có thể ngừng ghi bất cứ lúc nào.\", \"alertname\", \"AtlasDiskCritical\"), \"b_ten\", \"Hàng đợi ghi dữ liệu dài\", \"alertname\", \"AtlasLockQueueHigh\"), \"c_anh_huong\", \"Thao tác ghi phải chờ lâu.\", \"alertname\", \"AtlasLockQueueHigh\"), \"b_ten\", \"Máy ngoài ngừng gửi số liệu\", \"alertname\", \"ExternalHostSilent\"), \"c_anh_huong\", \"Không còn thấy tình trạng của máy đó.\", \"alertname\", \"ExternalHostSilent\"))",
+            "legendFormat": "",
+            "instant": true,
+            "format": "table"
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "table",
+      "version": "",
+      "spec": {
+       "options": {
+        "showHeader": true,
+        "cellHeight": "md",
+        "sortBy": [
+         {
+          "displayName": "Mức độ",
+          "desc": false
+         }
+        ]
+       },
+       "fieldConfig": {
+        "defaults": {
+         "custom": {
+          "align": "auto",
+          "cellOptions": {
+           "type": "auto"
+          },
+          "inspect": false
+         }
+        },
+        "overrides": [
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "Time"
+          },
+          "properties": [
+           {
+            "id": "custom.hidden",
+            "value": true
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "a_muc"
+          },
+          "properties": [
+           {
+            "id": "displayName",
+            "value": "Mức độ"
+           },
+           {
+            "id": "mappings",
+            "value": [
+             {
+              "type": "value",
+              "options": {
+               "critical": {
+                "text": "NGHIÊM TRỌNG",
+                "color": "red",
+                "index": 0
+               },
+               "warning": {
+                "text": "CẢNH BÁO",
+                "color": "orange",
+                "index": 1
+               }
+              }
+             }
+            ]
+           },
+           {
+            "id": "custom.cellOptions",
+            "value": {
+             "type": "color-background",
+             "mode": "basic"
+            }
+           },
+           {
+            "id": "custom.width",
+            "value": 160
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "b_ten"
+          },
+          "properties": [
+           {
+            "id": "displayName",
+            "value": "Cảnh báo"
+           },
+           {
+            "id": "custom.width",
+            "value": 380
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "c_anh_huong"
+          },
+          "properties": [
+           {
+            "id": "displayName",
+            "value": "Ảnh hưởng"
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "Value"
+          },
+          "properties": [
+           {
+            "id": "displayName",
+            "value": "Đã kéo dài"
+           },
+           {
+            "id": "unit",
+            "value": "s"
+           },
+           {
+            "id": "custom.width",
+            "value": 130
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   },
+   "panel-6": {
+    "kind": "Panel",
+    "spec": {
+     "id": 6,
+     "title": "Đăng nhập · Thời gian đăng nhập",
+     "description": "Thời gian phản hồi của ALB đăng nhập. Lượt đăng nhập và tỷ lệ thất bại lấy từ sự kiện GA4 login_success / login_fail (trung bình 5 phút).",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "max(aws_applicationelb_target_response_time_average{dimension_LoadBalancer=~\"$lb_login\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"})",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "s",
+         "decimals": 1,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 2,
+            "color": "orange"
+           },
+           {
+            "value": 5,
+            "color": "red"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-7": {
+    "kind": "Panel",
+    "spec": {
+     "id": 7,
+     "title": "Lượt đăng nhập mỗi phút",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "sum(ga4_event_count{event_name=~\"login_success\",window=\"5m\"}) / 5",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "suffix: lượt/phút",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "text"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-8": {
+    "kind": "Panel",
+    "spec": {
+     "id": 8,
+     "title": "Đăng nhập thất bại",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "100 * sum(ga4_event_count{event_name=~\"login_fail\",window=\"5m\"}) / clamp_min(sum(ga4_event_count{event_name=~\"login_success|login_fail\",window=\"5m\"}), 1)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percent",
+         "decimals": 2,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 2,
+            "color": "orange"
+           },
+           {
+            "value": 5,
+            "color": "red"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-9": {
+    "kind": "Panel",
+    "spec": {
+     "id": 9,
+     "title": "Thi · Thời gian phản hồi",
+     "description": "Thời gian phản hồi của ALB phục vụ thi. Số học sinh lấy từ lượt xem màn hình làm bài trên GA4. Tỷ lệ lỗi là lỗi 5xx trên tổng yêu cầu.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "max(aws_applicationelb_target_response_time_average{dimension_LoadBalancer=~\"$lb_exam\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"})",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "s",
+         "decimals": 1,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 1,
+            "color": "orange"
+           },
+           {
+            "value": 3,
+            "color": "red"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-10": {
+    "kind": "Panel",
+    "spec": {
+     "id": 10,
+     "title": "Học sinh đang thi",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "sum(ga4_screen_views{window=\"5m\",screen=~\"$scr_exam\"})",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "suffix: học sinh",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "text"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-11": {
+    "kind": "Panel",
+    "spec": {
+     "id": 11,
+     "title": "Tỷ lệ lỗi",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "100 * ((sum(aws_applicationelb_httpcode_target_5xx_count_sum{dimension_LoadBalancer=~\"$lb_exam\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"}) or vector(0)) + (sum(aws_applicationelb_httpcode_elb_5xx_count_sum{dimension_LoadBalancer=~\"$lb_exam\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"}) or vector(0))) / clamp_min(sum(aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$lb_exam\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"}), 1)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percent",
+         "decimals": 2,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 2,
+            "color": "orange"
+           },
+           {
+            "value": 5,
+            "color": "red"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-12": {
+    "kind": "Panel",
+    "spec": {
+     "id": 12,
+     "title": "Học tập · Thời gian phản hồi",
+     "description": "Thời gian phản hồi của ALB phục vụ học tập. Số người là tổng người dùng đang hoạt động trên GA4 (5 phút).",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "max(aws_applicationelb_target_response_time_average{dimension_LoadBalancer=~\"$lb_learn\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"})",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "s",
+         "decimals": 1,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 2,
+            "color": "orange"
+           },
+           {
+            "value": 5,
+            "color": "red"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-13": {
+    "kind": "Panel",
+    "spec": {
+     "id": 13,
+     "title": "Người đang dùng",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "sum(ga4_active_users{window=\"5m\"})",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "suffix: người",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "text"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-14": {
+    "kind": "Panel",
+    "spec": {
+     "id": 14,
+     "title": "Tỷ lệ lỗi",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "100 * ((sum(aws_applicationelb_httpcode_target_5xx_count_sum{dimension_LoadBalancer=~\"$lb_learn\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"}) or vector(0)) + (sum(aws_applicationelb_httpcode_elb_5xx_count_sum{dimension_LoadBalancer=~\"$lb_learn\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"}) or vector(0))) / clamp_min(sum(aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"$lb_learn\",dimension_AvailabilityZone=\"\",dimension_TargetGroup=\"\"}), 1)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percent",
+         "decimals": 2,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 2,
+            "color": "orange"
+           },
+           {
+            "value": 5,
+            "color": "red"
+           }
+          ]
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-15": {
+    "kind": "Panel",
+    "spec": {
+     "id": 15,
+     "title": "CPU máy chủ cao nhất",
+     "description": "Cao nhất trong các máy EC2 mà CloudWatch thấy (trung bình 5 phút).",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "max(aws_ec2_cpuutilization_average)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percent",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 60,
+            "color": "orange"
+           },
+           {
+            "value": 80,
+            "color": "red"
+           }
+          ]
+         },
+         "mappings": []
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-16": {
+    "kind": "Panel",
+    "spec": {
+     "id": 16,
+     "title": "Kết nối cơ sở dữ liệu cao nhất",
+     "description": "Tỷ lệ kết nối đã dùng so với giới hạn của node, cao nhất trong các cụm Atlas.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "100 * max(mongodb_connections_current / (mongodb_connections_current + mongodb_connections_available))",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percent",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 50,
+            "color": "orange"
+           },
+           {
+            "value": 75,
+            "color": "red"
+           }
+          ]
+         },
+         "mappings": []
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-17": {
+    "kind": "Panel",
+    "spec": {
+     "id": 17,
+     "title": "Cụm dữ liệu có node chính",
+     "description": "100% nghĩa là cụm nào cũng có node chính.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "100 * count(count by (cl_name) (mongodb_connections_current{rs_state=\"1\"})) / count(count by (cl_name) (mongodb_connections_current))",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percent",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "red"
+           },
+           {
+            "value": 100,
+            "color": "blue"
+           }
+          ]
+         },
+         "mappings": []
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-18": {
+    "kind": "Panel",
+    "spec": {
+     "id": 18,
+     "title": "Máy khỏe ít nhất sau cân bằng tải",
+     "description": "Số máy khỏe của ALB đang ít nhất. Bằng 0 là có dịch vụ không còn máy phục vụ.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "min(aws_applicationelb_healthy_host_count_minimum{dimension_AvailabilityZone=\"\"} >= 0)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "red"
+           },
+           {
+            "value": 1,
+            "color": "blue"
+           }
+          ]
+         },
+         "mappings": []
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-19": {
+    "kind": "Panel",
+    "spec": {
+     "id": 19,
+     "title": "Lambda bị giới hạn",
+     "description": "Tổng lượt bị giới hạn tải của các hàm Lambda.",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "fg2i9s0q45n28d"
+           },
+           "spec": {
+            "expr": "sum(aws_lambda_throttles_sum{dimension_Resource=\"\",dimension_FunctionName!=\"\"} > 0) or vector(0)",
+            "legendFormat": ""
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "",
+      "spec": {
+       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "textMode": "auto"
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short",
+         "decimals": 0,
+         "noValue": "Chưa có dữ liệu",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": null,
+            "color": "blue"
+           },
+           {
+            "value": 1,
+            "color": "orange"
+           },
+           {
+            "value": 100,
+            "color": "red"
+           }
+          ]
+         },
+         "mappings": []
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   }
+  },
+  "layout": {
+   "kind": "RowsLayout",
+   "spec": {
+    "rows": [
+     {
+      "kind": "RowsLayoutRow",
+      "spec": {
+       "title": "SỨC KHỎE CHUNG",
+       "collapse": false,
+       "layout": {
+        "kind": "GridLayout",
+        "spec": {
+         "items": [
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-1"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 12,
+            "y": 0,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-2"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 16,
+            "y": 0,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-3"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 20,
+            "y": 0,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-4"
+            }
+           }
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "kind": "RowsLayoutRow",
+      "spec": {
+       "title": "CẢNH BÁO ĐANG BẬT",
+       "collapse": false,
+       "layout": {
+        "kind": "GridLayout",
+        "spec": {
+         "items": [
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 7,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-5"
+            }
+           }
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "kind": "RowsLayoutRow",
+      "spec": {
+       "title": "ĐĂNG NHẬP · THI · HỌC TẬP",
+       "collapse": false,
+       "layout": {
+        "kind": "GridLayout",
+        "spec": {
+         "items": [
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 0,
+            "y": 0,
+            "width": 8,
+            "height": 5,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-6"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 0,
+            "y": 5,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-7"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 4,
+            "y": 5,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-8"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 8,
+            "y": 0,
+            "width": 8,
+            "height": 5,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-9"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 8,
+            "y": 5,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-10"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 12,
+            "y": 5,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-11"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 16,
+            "y": 0,
+            "width": 8,
+            "height": 5,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-12"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 16,
+            "y": 5,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-13"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 20,
+            "y": 5,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-14"
+            }
+           }
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "kind": "RowsLayoutRow",
+      "spec": {
+       "title": "HẠ TẦNG",
+       "collapse": false,
+       "layout": {
+        "kind": "GridLayout",
+        "spec": {
+         "items": [
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 0,
+            "y": 0,
+            "width": 5,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-15"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 5,
+            "y": 0,
+            "width": 5,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-16"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 10,
+            "y": 0,
+            "width": 5,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-17"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 15,
+            "y": 0,
+            "width": 5,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-18"
+            }
+           }
+          },
+          {
+           "kind": "GridLayoutItem",
+           "spec": {
+            "x": 20,
+            "y": 0,
+            "width": 4,
+            "height": 3,
+            "element": {
+             "kind": "ElementReference",
+             "name": "panel-19"
+            }
+           }
+          }
+         ]
+        }
+       }
+      }
+     }
+    ]
+   }
+  },
+  "links": [],
+  "liveNow": false,
+  "preload": false,
+  "tags": [
+   "monitor",
+   "health"
+  ],
+  "timeSettings": {
+   "timezone": "browser",
+   "from": "now-30m",
+   "to": "now",
+   "autoRefresh": "15s",
+   "autoRefreshIntervals": [
+    "5s",
+    "10s",
+    "30s",
+    "1m",
+    "5m",
+    "15m",
+    "30m",
+    "1h",
+    "2h",
+    "1d"
+   ],
+   "hideTimepicker": false,
+   "fiscalYearStartMonth": 0
+  },
+  "title": "Monitor | Sức khỏe hệ thống",
+  "variables": [
+   {
+    "kind": "TextVariable",
+    "spec": {
+     "name": "lb_login",
+     "label": "LB Đăng nhập",
+     "description": "Regex tên ALB phục vụ đăng nhập",
+     "query": "app/OAUTH-.*",
+     "current": {
+      "text": "app/OAUTH-.*",
+      "value": "app/OAUTH-.*"
+     },
+     "hide": "dontHide",
+     "skipUrlSync": false
+    }
+   },
+   {
+    "kind": "TextVariable",
+    "spec": {
+     "name": "lb_exam",
+     "label": "LB Thi",
+     "description": "Regex tên ALB phục vụ thi",
+     "query": "app/API-Onluyen-.*",
+     "current": {
+      "text": "app/API-Onluyen-.*",
+      "value": "app/API-Onluyen-.*"
+     },
+     "hide": "dontHide",
+     "skipUrlSync": false
+    }
+   },
+   {
+    "kind": "TextVariable",
+    "spec": {
+     "name": "lb_learn",
+     "label": "LB Học tập",
+     "description": "Regex tên ALB phục vụ học tập",
+     "query": "app/SCHOOL-API-.*",
+     "current": {
+      "text": "app/SCHOOL-API-.*",
+      "value": "app/SCHOOL-API-.*"
+     },
+     "hide": "dontHide",
+     "skipUrlSync": false
+    }
+   },
+   {
+    "kind": "TextVariable",
+    "spec": {
+     "name": "scr_exam",
+     "label": "Màn hình làm bài (GA4)",
+     "description": "Tên màn hình GA4 khi học sinh đang làm bài",
+     "query": "Assigment",
+     "current": {
+      "text": "Assigment",
+      "value": "Assigment"
+     },
+     "hide": "dontHide",
+     "skipUrlSync": false
+    }
+   }
+  ],
+  "description": "Màn hình tổng quan dễ đọc cho Đăng nhập, Thi, Học tập và Hạ tầng."
+ }
+}

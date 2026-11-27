@@ -1,0 +1,202 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  scale-api - nhan lenh preset tu nut Grafana (Actions) de scale EC2 ASG, Lambda Reserved Concurrency va MongoDB Atlas,
+  co chot an toan (Scaling Gate tu Prometheus, khung gio thi, trang thai Atlas IDLE, tran cung).
+
+Parameters:
+  PromUrl:
+    Type: String
+    Description: URL Prometheus ma Lambda goi duoc (vd http://10.0.1.20:9090). Bat buoc neu GateCheck=on.
+  ExamWindows:
+    Type: String
+    Default: "15:00-21:45"
+    Description: Khung gio thi (gio VN), nhieu khoang cach nhau dau phay. Trong khung nay cam doi tier Mongo va cam ha so may.
+  GateCheck:
+    Type: String
+    Default: "on"
+    AllowedValues: ["on", "off"]
+  SlackWebhookUrl:
+    Type: String
+    Default: ""
+    NoEcho: true
+  AsgApi:
+    Type: String
+    Default: api-demand-spot-auto-scaling-group
+  AsgOauth:
+    Type: String
+    Default: oauth-spot-medium-auto-scaling-group
+  AsgDatawrk:
+    Type: String
+    Default: datawrk-onluyen-vn
+  SubnetIds:
+    Type: CommaDelimitedList
+    Default: ""
+    Description: (Tuy chon) Subnet de Lambda vao duoc Prometheus noi bo. Can NAT de goi AWS API va Atlas.
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: ""
+
+Conditions:
+  UseVpc: !Not [!Equals [!Join ["", !Ref SubnetIds], ""]]
+
+Resources:
+  ScaleTokenSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: scale-api/token
+      Description: Token Grafana gui trong header X-Scale-Token
+      GenerateSecretString:
+        SecretStringTemplate: "{}"
+        GenerateStringKey: token
+        PasswordLength: 48
+        ExcludePunctuation: true
+
+  AtlasSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: scale-api/atlas
+      Description: 'Atlas API key - dien sau khi tao stack: {"public_key":"...","private_key":"...","group_id":"..."}'
+      SecretString: '{"public_key":"REPLACE","private_key":"REPLACE","group_id":"REPLACE"}'
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/scale-api
+      RetentionInDays: 180   # spec 9.1: audit 180 ngay
+
+  FunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: scale-api-lambda
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition: { StringEquals: { aws:SourceAccount: !Ref AWS::AccountId } }
+      ManagedPolicyArns:
+        - !If [UseVpc, arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole, !Ref AWS::NoValue]
+      Policies:
+        - PolicyName: scale
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AsgRead
+                Effect: Allow
+                Action: autoscaling:DescribeAutoScalingGroups
+                Resource: "*"
+              - Sid: AsgWriteOnly3Groups
+                Effect: Allow
+                Action: autoscaling:UpdateAutoScalingGroup
+                Resource:
+                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${AsgApi}
+                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${AsgOauth}
+                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${AsgDatawrk}
+              - Sid: LambdaConcurrencyOnly2Functions
+                Effect: Allow
+                Action: [lambda:GetFunctionConcurrency, lambda:PutFunctionConcurrency]
+                Resource:
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:examination-lambda
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:examination-lambda-oauth
+              - Sid: ReadOwnSecrets
+                Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: [!Ref ScaleTokenSecret, !Ref AtlasSecret]
+              - Sid: Logs
+                Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub ${LogGroup.Arn}:*
+              - Sid: NoDestructive
+                Effect: Deny
+                Action: ["autoscaling:Delete*", "autoscaling:TerminateInstanceInAutoScalingGroup", "lambda:Delete*", "ec2:Terminate*"]
+                Resource: "*"
+
+  Function:
+    Type: AWS::Lambda::Function
+    DependsOn: LogGroup
+    Properties:
+      FunctionName: scale-api
+      Runtime: python3.13
+      Handler: handler.handler
+      Code: .            # aws cloudformation package se upload thu muc nay len S3
+      Role: !GetAtt FunctionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      ReservedConcurrentExecutions: 2   # khong cho nhieu lenh scale chay chong nhau
+      Environment:
+        Variables:
+          PROM_URL: !Ref PromUrl
+          EXAM_WINDOWS: !Ref ExamWindows
+          GATE_CHECK: !Ref GateCheck
+          SLACK_WEBHOOK_URL: !Ref SlackWebhookUrl
+          TOKEN_SECRET_ARN: !Ref ScaleTokenSecret
+          ATLAS_SECRET_ARN: !Ref AtlasSecret
+          ASG_API: !Ref AsgApi
+          ASG_OAUTH: !Ref AsgOauth
+          ASG_DATAWRK: !Ref AsgDatawrk
+      VpcConfig: !If
+        - UseVpc
+        - { SubnetIds: !Ref SubnetIds, SecurityGroupIds: !Ref SecurityGroupIds }
+        - !Ref AWS::NoValue
+
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: scale-api
+      ProtocolType: HTTP
+
+  Integration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt Function.Arn
+      PayloadFormatVersion: "2.0"
+
+  Route:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: POST /scale
+      Target: !Sub integrations/${Integration}
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: $default
+      AutoDeploy: true
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 5
+        ThrottlingRateLimit: 1
+
+  InvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Function
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/POST/scale
+
+  ErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: scale-api-errors
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions: [{ Name: FunctionName, Value: !Ref Function }]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  ScaleUrl:
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/scale
+  TokenSecretArn:
+    Value: !Ref ScaleTokenSecret
+  AtlasSecretArn:
+    Value: !Ref AtlasSecret

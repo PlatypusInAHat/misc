@@ -1,0 +1,30 @@
+{
+  "apiVersion": 1,
+  "contactPoints": [
+    {
+      "orgId": 1,
+      "name": "Teams Workflows (English)",
+      "receivers": [
+        {
+          "uid": "teams-workflows-en",
+          "type": "webhook",
+          "disableResolveMessage": false,
+          "settings": {
+            "url": "https://defaultaa0104078fef463bbbdaf01407061e.5a.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/00/workflows/d9dc690b804f422297d0d24d4b344762/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPC5JU43WlQUXKUZcPupBr6tahglknbUDGkClKwF2_w",
+            "httpMethod": "POST",
+            "payload": {
+              "template": "{{ template \"teams_en.card\" . }}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "orgId": 1,
+      "name": "teams_en",
+      "template": "{{ define \"teams_en.title\" }}{{ if eq .Status \"firing\" }}{{ if eq .CommonLabels.severity \"critical\" }}🔴 CRITICAL{{ else }}🟠 WARNING{{ end }}{{ else }}✅ RESOLVED{{ end }} · {{ .CommonLabels.system }}{{ end }}\n\n{{ define \"teams_en.body\" }}{{ range .Alerts }}**{{ .Annotations.summary }}**\n\n{{ .Annotations.description }}\n\n{{ end }}{{ end }}\n\n{{ define \"teams_en.card\" }}{{ coll.Dict \"type\" \"message\" \"attachments\" (coll.Slice (coll.Dict \"contentType\" \"application/vnd.microsoft.card.adaptive\" \"content\" (coll.Dict \"$schema\" \"http://adaptivecards.io/schemas/adaptive-card.json\" \"type\" \"AdaptiveCard\" \"version\" \"1.4\" \"body\" (coll.Slice (coll.Dict \"type\" \"TextBlock\" \"text\" (tmpl.Exec \"teams_en.title\" .) \"weight\" \"Bolder\" \"size\" \"Medium\" \"wrap\" true) (coll.Dict \"type\" \"TextBlock\" \"text\" (tmpl.Exec \"teams_en.body\" .) \"wrap\" true)) \"actions\" (coll.Slice (coll.Dict \"type\" \"Action.OpenUrl\" \"title\" \"Open dashboard\" \"url\" (print .ExternalURL \"/d/system-health-edu\")))))) | data.ToJSON }}{{ end }}"
+    }
+  ]
+}

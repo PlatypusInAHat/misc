@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Xoa file trong bucket edmicro-media-upload sau 1 gio ke tu luc upload.
+  EventBridge Scheduler goi Lambda moi 5 phut; Lambda xoa object co LastModified cu hon MaxAgeSeconds.
+  Bucket da tao san (kem lifecycle 1 ngay lam luoi an toan), stack nay khong tao bucket.
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: edmicro-media-upload
+  MaxAgeSeconds:
+    Type: Number
+    Default: 3600
+    MinValue: 300
+  ScheduleExpression:
+    Type: String
+    Default: rate(5 minutes)
+
+Resources:
+  CleanupLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/media-upload-cleanup
+      RetentionInDays: 14
+
+  CleanupFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: media-upload-cleanup-lambda
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { aws:SourceAccount: !Ref AWS::AccountId }
+      Policies:
+        - PolicyName: cleanup
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub arn:aws:s3:::${BucketName}
+              - Effect: Allow
+                Action: s3:DeleteObject
+                Resource: !Sub arn:aws:s3:::${BucketName}/*
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub ${CleanupLogGroup.Arn}:*
+
+  CleanupFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: CleanupLogGroup
+    Properties:
+      FunctionName: media-upload-cleanup
+      Runtime: python3.13
+      Handler: index.handler
+      Role: !GetAtt CleanupFunctionRole.Arn
+      Timeout: 300
+      MemorySize: 256
+      ReservedConcurrentExecutions: 1   # khong cho 2 lan quet chay chong nhau
+      Environment:
+        Variables:
+          BUCKET: !Ref BucketName
+          MAX_AGE_SECONDS: !Ref MaxAgeSeconds
+      Code:
+        ZipFile: |
+          import datetime, json, os
+          import boto3
+
+          s3 = boto3.client("s3")
+          BUCKET = os.environ["BUCKET"]
+          MAX_AGE = int(os.environ["MAX_AGE_SECONDS"])
+
+          def _flush(batch):
+              resp = s3.delete_objects(Bucket=BUCKET, Delete={"Objects": batch, "Quiet": True})
+              errors = resp.get("Errors", [])
+              for e in errors:
+                  print(json.dumps({"level": "ERROR", "key": e.get("Key"), "code": e.get("Code"), "msg": e.get("Message")}))
+              return len(batch) - len(errors), len(errors)
+
+          def handler(event, context):
+              cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=MAX_AGE)
+              scanned = deleted = failed = 0
+              batch = []
+              for page in s3.get_paginator("list_objects_v2").paginate(Bucket=BUCKET):
+                  for obj in page.get("Contents", []):
+                      scanned += 1
+                      if obj["LastModified"] < cutoff:
+                          batch.append({"Key": obj["Key"]})
+                          if len(batch) == 1000:
+                              ok, bad = _flush(batch); deleted += ok; failed += bad; batch = []
+              if batch:
+                  ok, bad = _flush(batch); deleted += ok; failed += bad
+              result = {"bucket": BUCKET, "cutoff": cutoff.isoformat(), "scanned": scanned, "deleted": deleted, "failed": failed}
+              print(json.dumps(result))
+              if failed:
+                  raise RuntimeError(f"{failed} object(s) could not be deleted")
+              return result
+
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: media-upload-cleanup-scheduler
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: scheduler.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { aws:SourceAccount: !Ref AWS::AccountId }
+      Policies:
+        - PolicyName: invoke
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt CleanupFunction.Arn
+
+  CleanupSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: media-upload-cleanup-every-5m
+      ScheduleExpression: !Ref ScheduleExpression
+      FlexibleTimeWindow: { Mode: "OFF" }
+      State: ENABLED
+      Target:
+        Arn: !GetAtt CleanupFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        RetryPolicy: { MaximumRetryAttempts: 0 }   # lan quet sau se don tiep
+
+  CleanupErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: media-upload-cleanup-errors
+      AlarmDescription: Lambda xoa file media-upload bi loi; file co the ton tai qua 1 gio.
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions: [{ Name: FunctionName, Value: !Ref CleanupFunction }]
+      Statistic: Sum
+      Period: 900
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  FunctionName:
+    Value: !Ref CleanupFunction
+  ScheduleName:
+    Value: !Ref CleanupSchedule

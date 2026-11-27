@@ -1,0 +1,2357 @@
+{
+  "apiVersion": 1,
+  "groups": [
+    {
+      "orgId": 1,
+      "name": "Sức khỏe hệ thống - đang có số liệu",
+      "folder": "Sức khỏe hệ thống",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "err5xx_warn",
+          "title": "Server errors rising (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum) / sum(aws_applicationelb_request_count_sum)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        0.5,
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "3m",
+          "annotations": {
+            "summary": "Server errors rising: above warning threshold (0.5 %)",
+            "description": "Impact: Servers are starting to return errors, affecting some features sporadically."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "err5xx_crit",
+          "title": "Server errors rising (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum) / sum(aws_applicationelb_request_count_sum)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "3m",
+          "annotations": {
+            "summary": "Server errors rising: above critical threshold (1 %)",
+            "description": "Impact: Servers are returning many errors, affecting every feature."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "alb_resp_warn",
+          "title": "Slow server response (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_applicationelb_target_response_time_p95)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        1,
+                        3
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "3m",
+          "annotations": {
+            "summary": "Slow server response: above warning threshold (1 s)",
+            "description": "Impact: Users notice actions taking longer than usual."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "alb_resp_crit",
+          "title": "Slow server response (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_applicationelb_target_response_time_p95)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        3
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "3m",
+          "annotations": {
+            "summary": "Slow server response: above critical threshold (3 s)",
+            "description": "Impact: Users wait a very long time or hit timeouts."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "cpu_ec2_warn",
+          "title": "EC2 servers overloaded (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_ec2_cpuutilization_maximum)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        70,
+                        85
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "5m",
+          "annotations": {
+            "summary": "EC2 servers overloaded: above warning threshold (70 %)",
+            "description": "Impact: No user impact yet. May slow down if usage keeps rising."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "cpu_ec2_crit",
+          "title": "EC2 servers overloaded (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_ec2_cpuutilization_maximum)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        85
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "5m",
+          "annotations": {
+            "summary": "EC2 servers overloaded: above critical threshold (85 %)",
+            "description": "Impact: The system is about to slow down or fail."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "mongo_conn_warn",
+          "title": "Database running out of connections (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(mongodb_connections_current) / (sum(mongodb_connections_current) + sum(mongodb_connections_available))",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        70,
+                        85
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "3m",
+          "annotations": {
+            "summary": "Database running out of connections: above warning threshold (70 %)",
+            "description": "Impact: No user impact yet. Saving and submitting may slow down if it keeps rising."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "mongo_conn_crit",
+          "title": "Database running out of connections (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(mongodb_connections_current) / (sum(mongodb_connections_current) + sum(mongodb_connections_available))",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        85
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "3m",
+          "annotations": {
+            "summary": "Database running out of connections: above critical threshold (85 %)",
+            "description": "Impact: Saving, submitting and learning-data writes will be slow or fail."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "login_drop_warn",
+          "title": "Login volume dropped vs last week (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "sum(ga4_event_count{event_name=\"login\",window=\"5m\"}) / sum(ga4_event_count{event_name=\"login\",window=\"5m\"} offset 1w)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        0.3,
+                        0.6
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "10m",
+          "annotations": {
+            "summary": "Login volume dropped vs last week: above warning threshold (0.6 x)",
+            "description": "Impact: Fewer logins than usual; some users may be unable to get in."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Login"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "login_drop_crit",
+          "title": "Login volume dropped vs last week (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "sum(ga4_event_count{event_name=\"login\",window=\"5m\"}) / sum(ga4_event_count{event_name=\"login\",window=\"5m\"} offset 1w)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "lt",
+                      "params": [
+                        0.3
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "10m",
+          "annotations": {
+            "summary": "Login volume dropped vs last week: above critical threshold (0.3 x)",
+            "description": "Impact: Almost nobody can log in."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Login"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "alb_unhealthy",
+          "title": "Unhealthy server behind load balancer",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "sum(aws_applicationelb_un_healthy_host_count_maximum)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "3m",
+          "annotations": {
+            "summary": "Unhealthy server behind load balancer",
+            "description": "Impact: Part of the servers cannot serve requests; the remaining ones carry extra load."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "probe_down",
+          "title": "External health check failing",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "min(probe_success)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "lt",
+                      "params": [
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "External health check failing",
+            "description": "Impact: A web address cannot be reached from outside."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Infrastructure"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "mon_lost",
+          "title": "Monitoring signal lost",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "count(up == 0) or vector(0)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Monitoring signal lost",
+            "description": "Impact: The system may not be broken; the monitoring link may be down. Check the data source."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Monitoring"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "ga4_down",
+          "title": "GA4 data lost",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "min(ga4_up)",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "lt",
+                      "params": [
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "10m",
+          "annotations": {
+            "summary": "GA4 data lost",
+            "description": "Impact: Panels fed by GA4 (logins, learners, exam screens) are no longer updating."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Monitoring"
+          },
+          "isPaused": false
+        }
+      ]
+    },
+    {
+      "orgId": 1,
+      "name": "Sức khỏe hệ thống - đăng nhập, thi, học tập",
+      "folder": "Sức khỏe hệ thống",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "login_time_warn",
+          "title": "Slow login (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_applicationelb_target_response_time_p95{dimension_LoadBalancer=~\"app/OAUTH.*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        2,
+                        5
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Slow login: above warning threshold (2 s)",
+            "description": "Impact: Users wait longer to log in but can still get in."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Login"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "login_time_crit",
+          "title": "Slow login (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_applicationelb_target_response_time_p95{dimension_LoadBalancer=~\"app/OAUTH.*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        5
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Slow login: above critical threshold (5 s)",
+            "description": "Impact: Users can barely log in."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Login"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "login_fail_warn",
+          "title": "Login server errors rising (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"app/OAUTH.*\"}) / sum(aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"app/OAUTH.*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        2,
+                        5
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Login server errors rising: above warning threshold (2 %)",
+            "description": "Impact: Some users get server errors when logging in; retrying works."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Login"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "login_fail_crit",
+          "title": "Login server errors rising (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"app/OAUTH.*\"}) / sum(aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"app/OAUTH.*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        5
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Login server errors rising: above critical threshold (5 %)",
+            "description": "Impact: Many users cannot log in because of server errors."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Login"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "exam_submit_warn",
+          "title": "Slow exam processing (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_lambda_duration_p95{dimension_FunctionName=\"examination-lambda\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        1000,
+                        2500
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Slow exam processing: above warning threshold (1000 ms)",
+            "description": "Impact: Saving or submitting takes 1-2.5 seconds, no errors yet."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Exams"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "exam_submit_crit",
+          "title": "Slow exam processing (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_lambda_duration_p95{dimension_FunctionName=\"examination-lambda\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        2500
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Slow exam processing: above critical threshold (2500 ms)",
+            "description": "Impact: Students wait a long time on Save/Submit and may be unable to submit."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Exams"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "exam_save_warn",
+          "title": "Exam Lambda slowest run (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_lambda_duration_maximum{dimension_FunctionName=\"examination-lambda\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        3000,
+                        8000
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Exam Lambda slowest run: above warning threshold (3000 ms)",
+            "description": "Impact: Some save or submit requests are slow; slow answers may be written late."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Exams"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "exam_save_crit",
+          "title": "Exam Lambda slowest run (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_lambda_duration_maximum{dimension_FunctionName=\"examination-lambda\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        8000
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Exam Lambda slowest run: above critical threshold (8000 ms)",
+            "description": "Impact: Answers may not be saved in time, risk of timeouts."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Exams"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "exam_err_warn",
+          "title": "Exam errors rising (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_lambda_errors_sum{dimension_FunctionName=\"examination-lambda\"}) / sum(aws_lambda_invocations_sum{dimension_FunctionName=\"examination-lambda\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        0.3,
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Exam errors rising: above warning threshold (0.3 %)",
+            "description": "Impact: A few students see errors when saving or submitting."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Exams"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "exam_err_crit",
+          "title": "Exam errors rising (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_lambda_errors_sum{dimension_FunctionName=\"examination-lambda\"}) / sum(aws_lambda_invocations_sum{dimension_FunctionName=\"examination-lambda\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Exam errors rising: above critical threshold (1 %)",
+            "description": "Impact: Many students see errors when saving or submitting."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Exams"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "learn_load_warn",
+          "title": "Slow learning API (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_applicationelb_target_response_time_p95{dimension_LoadBalancer=~\"app/(API-Onluyen|SCHOOL-API).*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        3,
+                        6
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Slow learning API: above warning threshold (3 s)",
+            "description": "Impact: Lectures, videos and practice sets open slowly."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Learning"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "learn_load_crit",
+          "title": "Slow learning API (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "max(aws_applicationelb_target_response_time_p95{dimension_LoadBalancer=~\"app/(API-Onluyen|SCHOOL-API).*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        6
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Slow learning API: above critical threshold (6 s)",
+            "description": "Impact: Lessons barely open."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Learning"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "learn_err_warn",
+          "title": "Learning server errors rising (warning)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"app/(API-Onluyen|SCHOOL-API).*\"}) / sum(aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"app/(API-Onluyen|SCHOOL-API).*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "within_range",
+                      "params": [
+                        0.5,
+                        2
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Learning server errors rising: above warning threshold (0.5 %)",
+            "description": "Impact: Some learning actions show server errors."
+          },
+          "labels": {
+            "severity": "warning",
+            "system": "Learning"
+          },
+          "isPaused": false
+        },
+        {
+          "uid": "learn_err_crit",
+          "title": "Learning server errors rising (critical)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "fg2i9s0q45n28d",
+              "model": {
+                "refId": "A",
+                "expr": "100 * sum(aws_applicationelb_httpcode_target_5_xx_count_sum{dimension_LoadBalancer=~\"app/(API-Onluyen|SCHOOL-API).*\"}) / sum(aws_applicationelb_request_count_sum{dimension_LoadBalancer=~\"app/(API-Onluyen|SCHOOL-API).*\"})",
+                "instant": true,
+                "range": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+              }
+            },
+            {
+              "refId": "B",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "B",
+                "type": "reduce",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "A",
+                "reducer": "last",
+                "settings": {
+                  "mode": "dropNN"
+                }
+              }
+            },
+            {
+              "refId": "C",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "datasource": {
+                  "type": "__expr__",
+                  "uid": "__expr__"
+                },
+                "expression": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        2
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "for": "2m",
+          "annotations": {
+            "summary": "Learning server errors rising: above critical threshold (2 %)",
+            "description": "Impact: Many users cannot do or submit homework."
+          },
+          "labels": {
+            "severity": "critical",
+            "system": "Learning"
+          },
+          "isPaused": false
+        }
+      ]
+    }
+  ]
+}
